@@ -1,6 +1,7 @@
 package com.github.kvdz00.keybindplus.gui;
 
 import com.github.kvdz00.keybindplus.keybind.KeyConflict;
+import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
@@ -13,13 +14,15 @@ import java.util.List;
 
 public class ConflictWarningPopup extends Screen {
     private final Screen parent;
+    private final KeybindProfile profile;
     private final List<KeyConflict> conflicts;
     private final Runnable onApply;
     private ConflictListWidget conflictList;
 
-    public ConflictWarningPopup(Screen parent, List<KeyConflict> conflicts, Runnable onApply) {
+    public ConflictWarningPopup(Screen parent, KeybindProfile profile, List<KeyConflict> conflicts, Runnable onApply) {
         super(Component.translatable("keybindplus.popup.conflict_title"));
         this.parent = parent;
+        this.profile = profile;
         this.conflicts = conflicts;
         this.onApply = onApply;
     }
@@ -35,17 +38,22 @@ public class ConflictWarningPopup extends Screen {
         }
         this.addRenderableWidget(this.conflictList);
 
-        // Action buttons fixed at the bottom
+        // Action buttons fixed at the bottom: Apply Anyway, Resolve Conflicts, Cancel
         int btnY = this.height - 30;
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.conflict_apply"),
             btn -> { onApply.run(); this.minecraft.setScreenAndShow(parent); }
-        ).bounds(centerX - 105, btnY, 100, 20).build());
+        ).bounds(centerX - 154, btnY, 96, 20).build());
+
+        this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.popup.conflict_resolve"),
+            btn -> this.minecraft.setScreenAndShow(new KeybindEditorScreen(parent, profile, true))
+        ).bounds(centerX - 54, btnY, 114, 20).build());
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreenAndShow(parent)
-        ).bounds(centerX + 5, btnY, 100, 20).build());
+        ).bounds(centerX + 64, btnY, 90, 20).build());
     }
 
     @Override

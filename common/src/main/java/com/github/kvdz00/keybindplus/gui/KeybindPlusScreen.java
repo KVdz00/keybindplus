@@ -22,6 +22,7 @@ public class KeybindPlusScreen extends Screen {
     private ProfileListWidget profileList;
     private EditBox searchField;
     private Button loadButton;
+    private Button editButton;
     private Button deleteButton;
     private Button compareButton;
     private Button exportButton;
@@ -52,30 +53,42 @@ public class KeybindPlusScreen extends Screen {
 
         // Row 1: Primary Action buttons
         int btnY1 = this.height - 56;
+        int rx1 = centerX - 154;
+
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.save"),
             btn -> onSave()
-        ).bounds(centerX - 154, btnY1, 72, 20).build());
+        ).bounds(rx1, btnY1, 68, 20).build());
+        rx1 += 72;
 
         this.loadButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.load"),
             btn -> onLoad()
-        ).bounds(centerX - 78, btnY1, 50, 20).build());
+        ).bounds(rx1, btnY1, 46, 20).build());
+        rx1 += 50;
+
+        this.editButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.edit"),
+            btn -> onEdit()
+        ).bounds(rx1, btnY1, 44, 20).build());
+        rx1 += 48;
 
         this.undoButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.undo"),
             btn -> onUndo()
-        ).bounds(centerX - 24, btnY1, 50, 20).build());
+        ).bounds(rx1, btnY1, 44, 20).build());
+        rx1 += 48;
 
         this.compareButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.compare"),
             btn -> onCompare()
-        ).bounds(centerX + 30, btnY1, 60, 20).build());
+        ).bounds(rx1, btnY1, 52, 20).build());
+        rx1 += 56;
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.done"),
             btn -> this.onClose()
-        ).bounds(centerX + 94, btnY1, 60, 20).build());
+        ).bounds(rx1, btnY1, 38, 20).build());
 
         // Row 2: Management buttons
         int btnY2 = this.height - 32;
@@ -136,6 +149,7 @@ public class KeybindPlusScreen extends Screen {
     public void onSelectionUpdated() {
         boolean hasSelection = profileList != null && profileList.getSelectedProfile() != null;
         if (loadButton != null) loadButton.active = hasSelection;
+        if (editButton != null) editButton.active = hasSelection;
         if (compareButton != null) compareButton.active = hasSelection;
         if (exportButton != null) exportButton.active = hasSelection;
         if (renameButton != null) renameButton.active = hasSelection;
@@ -174,12 +188,18 @@ public class KeybindPlusScreen extends Screen {
 
         List<KeyConflict> conflicts = ConflictDetector.detect(profile);
         if (!conflicts.isEmpty()) {
-            this.minecraft.setScreenAndShow(new ConflictWarningPopup(this, conflicts, () -> {
+            this.minecraft.setScreenAndShow(new ConflictWarningPopup(this, profile, conflicts, () -> {
                 applyProfile(profile);
             }));
         } else {
             applyProfile(profile);
         }
+    }
+
+    private void onEdit() {
+        KeybindProfile profile = profileList.getSelectedProfile();
+        if (profile == null) return;
+        this.minecraft.setScreenAndShow(new KeybindEditorScreen(this, profile, false));
     }
 
     private void applyProfile(KeybindProfile profile) {
