@@ -14,6 +14,13 @@ KeybindPlus is a client-side Minecraft mod that lets you create, manage, and swi
 - **One-Click Undo**: Revert to your previous keybind configuration immediately after loading a profile.
 - **Rolling Auto-Backup**: Automatically creates rolling backups (up to 5) before applying a new profile.
 - **Import & Export**: Export profiles to JSON files and import them using your operating system's native file chooser with schema validation.
+- **Clean UI & Zero Chat Clutter**: Operates silently without spamming in-game chat. SystemToast notifications are reserved strictly for external file import and export operations.
+
+---
+
+## Supported Versions
+
+KeybindPlus actively supports modern Minecraft versions and maintains separate branches for legacy releases (down to 1.17.x and 1.8.9 PvP). See [VERSIONS.md](VERSIONS.md) for the full version matrix and branching roadmap.
 
 ---
 

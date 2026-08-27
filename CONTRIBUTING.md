@@ -16,17 +16,28 @@ Please maintain a constructive, respectful, and collaborative environment across
 - Open a Feature Request describing your use case and proposed workflow.
 
 ### Submitting Pull Requests
-1. Fork the repository and create a descriptive branch:
+1. Fork the repository and create a descriptive branch from `main`:
    ```bash
    git checkout -b feat/my-new-feature
    ```
 2. Follow standard Java coding conventions and keep code comments minimal, concise, and focused on essential logic.
 3. Avoid adding emoji characters to code, comments, log messages, or UI labels.
-4. Ensure the project builds cleanly before opening a pull request:
+4. **UI & Notification Policy**:
+   - Do NOT send diagnostic messages or feedback via player in-game chat (`sendSystemMessage`).
+   - In-game actions (profile switches, saves, key edits) should provide immediate visual feedback in the GUI.
+   - `SystemToast` notifications are reserved strictly for asynchronous external file I/O (profile JSON import and export).
+   - Use the SLF4J logger (`KeybindPlus.LOGGER`) for backend error handling and diagnostic tracking.
+5. Ensure the project builds cleanly before opening a pull request:
    ```bash
    ./gradlew build
    ```
-5. Submit a pull request targeting the `main` branch with a clear summary of changes.
+6. Submit a pull request targeting the `main` branch with a clear summary of changes.
+
+## Branching Guidelines
+
+- **`main`**: Production-ready, clean open-source code targeting the current active Minecraft release.
+- **`debug-tools`**: Dedicated development branch containing extended debug instrumentation and experimental testing utilities.
+- **Version branches** (e.g. `1.21.x`, `1.20.x`, `1.8.9`): Platform port branches maintaining compatibility with specific Minecraft releases. See [VERSIONS.md](VERSIONS.md).
 
 ## Architecture Overview
 

@@ -20,8 +20,9 @@ KeybindPlus follows standard Minecraft modding practices by maintaining version-
 
 ## Branching Conventions
 
-- **`main`**: The primary branch targeting the latest modern Minecraft snapshot/release.
-- **`<mc-version>`** (e.g. `1.20.x`, `1.19.x`): Branches maintaining compatibility for specific modern Minecraft minor releases.
+- **`main`**: The primary production branch targeting the latest modern Minecraft snapshot/release.
+- **`debug-tools`**: Development branch containing extended diagnostics, chat logging tools, and experimental test utilities.
+- **`<mc-version>`** (e.g. `1.21.x`, `1.20.x`, `1.19.x`): Branches maintaining compatibility for specific modern Minecraft minor releases.
 - **`1.8.9`**: Dedicated legacy branch using Forge 1.8.9 / MCP / RetroLoom toolchain targeting legacy PvP clients.
 
 ---
