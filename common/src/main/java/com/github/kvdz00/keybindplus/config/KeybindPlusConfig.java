@@ -45,6 +45,10 @@ public final class KeybindPlusConfig {
         return getConfigDir().resolve("imports");
     }
 
+    public static Path getBackupsDir() {
+        return getConfigDir().resolve("backups");
+    }
+
     public static void load() {
         configPath = getConfigDir().resolve("config.json");
         try {
@@ -52,6 +56,7 @@ public final class KeybindPlusConfig {
             Files.createDirectories(getProfilesDir());
             Files.createDirectories(getExportsDir());
             Files.createDirectories(getImportsDir());
+            Files.createDirectories(getBackupsDir());
 
             if (Files.exists(configPath)) {
                 String json = Files.readString(configPath);

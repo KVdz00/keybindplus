@@ -3,14 +3,22 @@ package com.github.kvdz00.keybindplus.profile;
 import com.github.kvdz00.keybindplus.KeybindPlus;
 import com.github.kvdz00.keybindplus.config.KeybindPlusConfig;
 import com.github.kvdz00.keybindplus.keybind.KeybindCapture;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public final class ProfileManager {
+    private static final int MAX_BACKUPS = 5;
+    private static final DateTimeFormatter BACKUP_FORMAT =
+        DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").withZone(ZoneId.systemDefault());
+
     private static ProfileManager instance;
     private final List<KeybindProfile> profiles = new ArrayList<>();
 
@@ -105,6 +113,41 @@ public final class ProfileManager {
         }
     }
 
+    public boolean renameProfile(String oldName, String newName) {
+        KeybindProfile profile = getProfile(oldName);
+        if (profile == null) return false;
+        if (getProfile(newName) != null) return false;
+
+        Path oldFile = KeybindPlusConfig.getProfilesDir().resolve(profile.toFileName());
+        try {
+            Files.deleteIfExists(oldFile);
+        } catch (IOException e) {
+            KeybindPlus.LOGGER.error("Failed to delete old profile file: {}", e.getMessage());
+            return false;
+        }
+
+        boolean wasDefault = profile.isDefault();
+        profile.setName(newName);
+        profile.setUpdatedAt(Instant.now());
+        writeProfileToFile(profile);
+
+        if (wasDefault) {
+            KeybindPlusConfig.get().setDefaultProfile(newName);
+        }
+        return true;
+    }
+
+    public KeybindProfile duplicateProfile(String sourceName, String newName) {
+        KeybindProfile source = getProfile(sourceName);
+        if (source == null) return null;
+        if (getProfile(newName) != null) return null;
+
+        KeybindProfile copy = new KeybindProfile(newName, source.getKeybinds());
+        profiles.add(copy);
+        writeProfileToFile(copy);
+        return copy;
+    }
+
     public List<KeybindProfile> listProfiles() {
         return Collections.unmodifiableList(profiles);
     }
@@ -158,6 +201,16 @@ public final class ProfileManager {
         }
     }
 
+    public static boolean isValidProfileFile(Path file) {
+        try {
+            String content = Files.readString(file);
+            JsonObject obj = JsonParser.parseString(content).getAsJsonObject();
+            return obj.has("schemaVersion") && obj.has("keybinds") && obj.has("name");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public List<Path> listImportFiles() {
         Path dir = KeybindPlusConfig.getImportsDir();
         try {
@@ -168,6 +221,46 @@ public final class ProfileManager {
             }
         } catch (IOException e) {
             return List.of();
+        }
+    }
+
+    public void createAutoBackup() {
+        Map<String, String> currentKeybinds = KeybindCapture.captureAll();
+        if (currentKeybinds.isEmpty()) return;
+
+        KeybindProfile backup = new KeybindProfile("backup_" + BACKUP_FORMAT.format(Instant.now()), currentKeybinds);
+        Path backupDir = KeybindPlusConfig.getBackupsDir();
+        Path backupFile = backupDir.resolve(backup.toFileName());
+
+        try {
+            Files.createDirectories(backupDir);
+            String json = ProfileSerializer.serialize(backup);
+            Files.writeString(backupFile, json);
+            pruneOldBackups(backupDir);
+            KeybindPlus.LOGGER.info("Auto-backup created: {}", backupFile.getFileName());
+        } catch (IOException e) {
+            KeybindPlus.LOGGER.error("Failed to create auto-backup: {}", e.getMessage());
+        }
+    }
+
+    private void pruneOldBackups(Path backupDir) {
+        try (var stream = Files.list(backupDir)) {
+            List<Path> backups = stream
+                .filter(p -> p.getFileName().toString().startsWith("backup_"))
+                .filter(p -> p.toString().endsWith(".json"))
+                .sorted(Comparator.comparingLong(p -> {
+                    try { return Files.getLastModifiedTime(p).toMillis(); }
+                    catch (IOException e) { return 0L; }
+                }))
+                .collect(Collectors.toList());
+
+            while (backups.size() > MAX_BACKUPS) {
+                Path oldest = backups.remove(0);
+                Files.deleteIfExists(oldest);
+                KeybindPlus.LOGGER.info("Pruned old backup: {}", oldest.getFileName());
+            }
+        } catch (IOException e) {
+            KeybindPlus.LOGGER.error("Failed to prune backups: {}", e.getMessage());
         }
     }
 

@@ -2,6 +2,7 @@ package com.github.kvdz00.keybindplus;
 
 import com.github.kvdz00.keybindplus.config.KeybindPlusConfig;
 import com.github.kvdz00.keybindplus.gui.KeybindPlusScreen;
+import com.github.kvdz00.keybindplus.gui.ToastNotification;
 import com.github.kvdz00.keybindplus.keybind.KeybindApplier;
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import com.github.kvdz00.keybindplus.profile.ProfileManager;
@@ -25,15 +26,27 @@ public final class KeybindPlusClient {
         KEYBIND_CATEGORY
     );
 
+    public static final KeyMapping QUICK_LOAD_KEY = new KeyMapping(
+        "key.keybindplus.quick_load",
+        InputConstants.Type.KEYSYM,
+        InputConstants.UNKNOWN.getValue(),
+        KEYBIND_CATEGORY
+    );
+
     private static boolean autoLoaded = false;
 
     public static void initClient() {
         KeybindPlus.LOGGER.info("KeybindPlus client initializing");
         KeyMappingRegistry.register(OPEN_GUI_KEY);
+        KeyMappingRegistry.register(QUICK_LOAD_KEY);
 
         ClientTickEvent.CLIENT_POST.register(client -> {
             if (OPEN_GUI_KEY.consumeClick()) {
                 Minecraft.getInstance().setScreenAndShow(new KeybindPlusScreen());
+            }
+
+            if (QUICK_LOAD_KEY.consumeClick()) {
+                onQuickLoad();
             }
 
             if (!autoLoaded && client.player != null) {
@@ -41,6 +54,19 @@ public final class KeybindPlusClient {
                 autoLoadDefault();
             }
         });
+    }
+
+    private static void onQuickLoad() {
+        KeybindProfile defaultProfile = ProfileManager.get().getDefaultProfile();
+        if (defaultProfile == null) {
+            ToastNotification.toast("keybindplus.toast.error_title",
+                "keybindplus.toast.no_default");
+            return;
+        }
+        ProfileManager.get().createAutoBackup();
+        KeybindApplier.apply(defaultProfile);
+        ToastNotification.toast("keybindplus.toast.quick_load_title",
+            "keybindplus.toast.quick_load_desc", defaultProfile.getName());
     }
 
     private static void autoLoadDefault() {
