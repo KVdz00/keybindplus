@@ -23,13 +23,17 @@ public class KeybindPlusScreen extends Screen {
     private EditBox searchField;
     private Button loadButton;
     private Button editButton;
-    private Button deleteButton;
-    private Button compareButton;
-    private Button exportButton;
-    private Button setDefaultButton;
     private Button undoButton;
+    private Button saveButton;
+    private Button compareButton;
+    private Button setDefaultButton;
     private Button renameButton;
     private Button duplicateButton;
+    private Button deleteButton;
+    private Button openFolderButton;
+    private Button importButton;
+    private Button exportButton;
+    private Button doneButton;
 
     public KeybindPlusScreen() {
         super(Component.translatable("keybindplus.screen.title"));
@@ -48,92 +52,79 @@ public class KeybindPlusScreen extends Screen {
 
         // Profile list
         this.profileList = new ProfileListWidget(this.minecraft, this,
-            this.width, this.height - 114, 48, 28);
+            this.width, this.height - 134, 48, 28);
         this.addRenderableWidget(this.profileList);
 
-        // Row 1: Primary Action buttons
-        int btnY1 = this.height - 56;
-        int rx1 = centerX - 154;
-
-        this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.save"),
-            btn -> onSave()
-        ).bounds(rx1, btnY1, 68, 20).build());
-        rx1 += 72;
-
+        // Row 1: Core Primary Actions (3 wide buttons)
+        int btnY1 = this.height - 76;
         this.loadButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.load"),
             btn -> onLoad()
-        ).bounds(rx1, btnY1, 46, 20).build());
-        rx1 += 50;
+        ).bounds(centerX - 154, btnY1, 100, 20).build());
 
         this.editButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.edit"),
             btn -> onEdit()
-        ).bounds(rx1, btnY1, 44, 20).build());
-        rx1 += 48;
+        ).bounds(centerX - 50, btnY1, 100, 20).build());
 
         this.undoButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.undo"),
             btn -> onUndo()
-        ).bounds(rx1, btnY1, 44, 20).build());
-        rx1 += 48;
+        ).bounds(centerX + 54, btnY1, 100, 20).build());
+
+        // Row 2: Profile Management Actions (6 buttons)
+        int btnY2 = this.height - 52;
+        this.saveButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.save"),
+            btn -> onSave()
+        ).bounds(centerX - 154, btnY2, 74, 20).build());
 
         this.compareButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.compare"),
             btn -> onCompare()
-        ).bounds(rx1, btnY1, 52, 20).build());
-        rx1 += 56;
-
-        this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.done"),
-            btn -> this.onClose()
-        ).bounds(rx1, btnY1, 38, 20).build());
-
-        // Row 2: Management buttons
-        int btnY2 = this.height - 32;
-        int bx = centerX - 154;
-
-        this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.open_folder"),
-            btn -> onOpenFolder()
-        ).bounds(bx, btnY2, 42, 20).build());
-        bx += 45;
-
-        this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.import"),
-            btn -> onImport()
-        ).bounds(bx, btnY2, 44, 20).build());
-        bx += 47;
-
-        this.exportButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.export"),
-            btn -> onExport()
-        ).bounds(bx, btnY2, 44, 20).build());
-        bx += 47;
-
-        this.renameButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.rename"),
-            btn -> onRename()
-        ).bounds(bx, btnY2, 50, 20).build());
-        bx += 53;
-
-        this.duplicateButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.duplicate"),
-            btn -> onDuplicate()
-        ).bounds(bx, btnY2, 38, 20).build());
-        bx += 41;
-
-        this.deleteButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.delete"),
-            btn -> onDelete()
-        ).bounds(bx, btnY2, 38, 20).build());
-        bx += 41;
+        ).bounds(centerX - 76, btnY2, 54, 20).build());
 
         this.setDefaultButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.set_default"),
             btn -> onSetDefault()
-        ).bounds(bx, btnY2, 44, 20).build());
+        ).bounds(centerX - 18, btnY2, 50, 20).build());
+
+        this.renameButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.rename"),
+            btn -> onRename()
+        ).bounds(centerX + 36, btnY2, 48, 20).build());
+
+        this.duplicateButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.duplicate"),
+            btn -> onDuplicate()
+        ).bounds(centerX + 88, btnY2, 40, 20).build());
+
+        this.deleteButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.delete"),
+            btn -> onDelete()
+        ).bounds(centerX + 132, btnY2, 40, 20).build());
+
+        // Row 3: File I/O & Navigation (4 evenly spaced buttons)
+        int btnY3 = this.height - 28;
+        this.openFolderButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.open_folder"),
+            btn -> onOpenFolder()
+        ).bounds(centerX - 154, btnY3, 74, 20).build());
+
+        this.importButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.import"),
+            btn -> onImport()
+        ).bounds(centerX - 76, btnY3, 74, 20).build());
+
+        this.exportButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.export"),
+            btn -> onExport()
+        ).bounds(centerX + 2, btnY3, 74, 20).build());
+
+        this.doneButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.done"),
+            btn -> this.onClose()
+        ).bounds(centerX + 80, btnY3, 74, 20).build());
 
         refreshList();
     }
