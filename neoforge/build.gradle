@@ -23,6 +23,8 @@ configurations {
 
 dependencies {
     implementation "net.neoforged:neoforge:${rootProject.property("neoforge_version")}"
+    implementation "net.neoforged.fancymodloader:loader:11.0.16"
+    implementation "net.neoforged:bus:8.0.5"
     implementation "dev.architectury:architectury-neoforge:${rootProject.property("architectury_api_version")}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
