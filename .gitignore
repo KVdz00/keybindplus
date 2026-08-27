@@ -1,0 +1,26 @@
+# Gradle & Loom Build Caches
+.gradle/
+build/
+bin/
+out/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.run/
+.vscode/
+.classpath
+.project
+.settings/
+
+# Runtime test dirs & logs
+run/
+runs/
+*.log
+*.log.gz
+
+# OS
+.DS_Store
+Thumbs.db

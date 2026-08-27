@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "keybindplus",
+  "version": "${version}",
+  "name": "KeybindPlus",
+  "description": "Keybind profile manager for PvP & modded Minecraft players. Save, load, compare, and share keybind profiles.",
+  "authors": ["KVdz00"],
+  "contact": {
+    "homepage": "https://github.com/KVdz00/keybindplus",
+    "sources": "https://github.com/KVdz00/keybindplus"
+  },
+  "license": "MIT",
+  "icon": "assets/keybindplus/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.github.kvdz00.keybindplus.fabric.KeybindPlusFabric"],
+    "client": ["com.github.kvdz00.keybindplus.fabric.KeybindPlusFabricClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": ">=26.2",
+    "java": ">=25",
+    "fabric-api": "*",
+    "architectury": "*"
+  }
+}
