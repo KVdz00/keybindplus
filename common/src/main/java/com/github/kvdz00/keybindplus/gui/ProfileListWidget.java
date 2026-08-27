@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -22,9 +23,18 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
     }
 
     public void updateEntries(List<KeybindProfile> profiles) {
+        KeybindProfile prevSelected = getSelectedProfile();
         this.clearEntries();
+        Entry toSelect = null;
         for (KeybindProfile profile : profiles) {
-            this.addEntry(new Entry(profile));
+            Entry entry = new Entry(profile);
+            this.addEntry(entry);
+            if (prevSelected != null && profile.getName().equals(prevSelected.getName())) {
+                toSelect = entry;
+            }
+        }
+        if (toSelect != null) {
+            this.setSelected(toSelect);
         }
     }
 
@@ -33,10 +43,18 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
         return entry != null ? entry.profile : null;
     }
 
+    @Override
+    public void setSelected(Entry entry) {
+        super.setSelected(entry);
+        if (this.parentScreen != null) {
+            this.parentScreen.onSelectionUpdated();
+        }
+    }
+
     private static String formatRelativeTime(Instant instant) {
         if (instant == null) return "";
         Duration d = Duration.between(instant, Instant.now());
-        long secs = d.getSeconds();
+        long secs = Math.max(0, d.getSeconds());
         if (secs < 60) return secs + "s";
         if (secs < 3600) return (secs / 60) + "m";
         if (secs < 86400) return (secs / 3600) + "h";
@@ -53,9 +71,9 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
         @Override
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
                                    boolean hovered, float delta) {
-            String name = profile.getName();
+            MutableComponent title = Component.literal(profile.getName()).withStyle(ChatFormatting.WHITE);
             if (profile.isDefault()) {
-                name += " [DEFAULT]";
+                title.append(Component.literal(" [DEFAULT]").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
             }
 
             int keyCount = profile.getKeybinds().size();
@@ -65,15 +83,17 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
                 meta += " | " + timeAgo + " ago";
             }
 
-            graphics.textRenderer().accept(this.getX() + 5, this.getY() + 2,
-                Component.literal(name));
-            graphics.textRenderer().accept(this.getX() + 5, this.getY() + 12,
-                Component.literal(meta).withStyle(ChatFormatting.GRAY));
+            graphics.textRenderer().accept(this.getX() + 6, this.getY() + 3, title);
+            graphics.textRenderer().accept(this.getX() + 6, this.getY() + 14,
+                Component.literal(meta).withStyle(ChatFormatting.DARK_GRAY));
         }
 
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
             ProfileListWidget.this.setSelected(this);
+            if (doubleClick) {
+                ProfileListWidget.this.parentScreen.onLoad();
+            }
             return true;
         }
 

@@ -39,18 +39,18 @@ public class KeybindPlusScreen extends Screen {
         int centerX = this.width / 2;
 
         // Search field
-        this.searchField = new EditBox(this.font, centerX - 100, 28, 200, 18,
+        this.searchField = new EditBox(this.font, centerX - 100, 26, 200, 18,
             Component.translatable("keybindplus.screen.search"));
         this.searchField.setHint(Component.translatable("keybindplus.screen.search"));
         this.searchField.setResponder(query -> refreshList());
         this.addRenderableWidget(this.searchField);
 
-        // Profile list (taller items for 2-line display)
+        // Profile list
         this.profileList = new ProfileListWidget(this.minecraft, this,
-            this.width, this.height - 112, 52, 26);
+            this.width, this.height - 114, 48, 28);
         this.addRenderableWidget(this.profileList);
 
-        // Row 1: Action buttons
+        // Row 1: Primary Action buttons
         int btnY1 = this.height - 56;
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.save"),
@@ -66,7 +66,6 @@ public class KeybindPlusScreen extends Screen {
             Component.translatable("keybindplus.screen.undo"),
             btn -> onUndo()
         ).bounds(centerX - 24, btnY1, 50, 20).build());
-        this.undoButton.active = KeybindApplier.hasUndoSnapshot();
 
         this.compareButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.compare"),
@@ -86,42 +85,42 @@ public class KeybindPlusScreen extends Screen {
             Component.translatable("keybindplus.screen.open_folder"),
             btn -> onOpenFolder()
         ).bounds(bx, btnY2, 42, 20).build());
-        bx += 46;
+        bx += 45;
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.import"),
             btn -> onImport()
         ).bounds(bx, btnY2, 44, 20).build());
-        bx += 48;
+        bx += 47;
 
         this.exportButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.export"),
             btn -> onExport()
         ).bounds(bx, btnY2, 44, 20).build());
-        bx += 48;
+        bx += 47;
 
         this.renameButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.rename"),
             btn -> onRename()
         ).bounds(bx, btnY2, 50, 20).build());
-        bx += 54;
+        bx += 53;
 
         this.duplicateButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.duplicate"),
             btn -> onDuplicate()
-        ).bounds(bx, btnY2, 36, 20).build());
-        bx += 40;
+        ).bounds(bx, btnY2, 38, 20).build());
+        bx += 41;
 
         this.deleteButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.delete"),
             btn -> onDelete()
-        ).bounds(bx, btnY2, 36, 20).build());
-        bx += 40;
+        ).bounds(bx, btnY2, 38, 20).build());
+        bx += 41;
 
         this.setDefaultButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.set_default"),
             btn -> onSetDefault()
-        ).bounds(bx, btnY2, 46, 20).build());
+        ).bounds(bx, btnY2, 44, 20).build());
 
         refreshList();
     }
@@ -131,13 +130,19 @@ public class KeybindPlusScreen extends Screen {
         String query = searchField != null ? searchField.getValue() : "";
         List<KeybindProfile> profiles = pm.searchProfiles(query);
         profileList.updateEntries(profiles);
-        updateUndoButton();
+        onSelectionUpdated();
     }
 
-    private void updateUndoButton() {
-        if (undoButton != null) {
-            undoButton.active = KeybindApplier.hasUndoSnapshot();
-        }
+    public void onSelectionUpdated() {
+        boolean hasSelection = profileList != null && profileList.getSelectedProfile() != null;
+        if (loadButton != null) loadButton.active = hasSelection;
+        if (compareButton != null) compareButton.active = hasSelection;
+        if (exportButton != null) exportButton.active = hasSelection;
+        if (renameButton != null) renameButton.active = hasSelection;
+        if (duplicateButton != null) duplicateButton.active = hasSelection;
+        if (deleteButton != null) deleteButton.active = hasSelection;
+        if (setDefaultButton != null) setDefaultButton.active = hasSelection;
+        if (undoButton != null) undoButton.active = KeybindApplier.hasUndoSnapshot();
     }
 
     private void onOpenFolder() {
@@ -168,7 +173,7 @@ public class KeybindPlusScreen extends Screen {
         }));
     }
 
-    private void onLoad() {
+    public void onLoad() {
         KeybindProfile profile = profileList.getSelectedProfile();
         if (profile == null) {
             ToastNotification.toast("keybindplus.toast.error_title",
@@ -191,7 +196,7 @@ public class KeybindPlusScreen extends Screen {
         ApplyResult result = KeybindApplier.apply(profile);
         ToastNotification.toast("keybindplus.toast.loaded_title",
             "keybindplus.toast.loaded_desc", profile.getName());
-        updateUndoButton();
+        onSelectionUpdated();
     }
 
     private void onUndo() {
@@ -203,7 +208,7 @@ public class KeybindPlusScreen extends Screen {
         KeybindApplier.undoLastApply();
         ToastNotification.toast("keybindplus.toast.undo_title",
             "keybindplus.toast.undo_desc");
-        updateUndoButton();
+        onSelectionUpdated();
     }
 
     private void onDelete() {
@@ -244,7 +249,6 @@ public class KeybindPlusScreen extends Screen {
     }
 
     private void onImport() {
-        // Run file dialog on a separate thread to avoid freezing the game
         new Thread(() -> {
             String defaultPath = KeybindPlusConfig.getImportsDir().toAbsolutePath().toString();
             String result;

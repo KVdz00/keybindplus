@@ -32,6 +32,13 @@ public final class ProfileManager {
         return instance;
     }
 
+    public void syncDefaultFlags() {
+        String defaultName = KeybindPlusConfig.get().getDefaultProfile();
+        for (var p : profiles) {
+            p.setDefault(!defaultName.isEmpty() && p.getName().equals(defaultName));
+        }
+    }
+
     public void loadAllProfiles() {
         profiles.clear();
         Path dir = KeybindPlusConfig.getProfilesDir();
@@ -58,11 +65,7 @@ public final class ProfileManager {
             KeybindPlus.LOGGER.error("Failed to list profiles: {}", e.getMessage());
         }
 
-        String defaultName = KeybindPlusConfig.get().getDefaultProfile();
-        for (var p : profiles) {
-            p.setDefault(p.getName().equals(defaultName));
-        }
-
+        syncDefaultFlags();
         KeybindPlus.LOGGER.info("Loaded {} profiles", profiles.size());
     }
 
@@ -84,6 +87,7 @@ public final class ProfileManager {
             profiles.add(profile);
         }
 
+        syncDefaultFlags();
         writeProfileToFile(profile);
         return profile;
     }
@@ -106,6 +110,7 @@ public final class ProfileManager {
             if (profile.isDefault()) {
                 KeybindPlusConfig.get().setDefaultProfile("");
             }
+            syncDefaultFlags();
             return true;
         } catch (IOException e) {
             KeybindPlus.LOGGER.error("Failed to delete profile {}: {}", name, e.getMessage());
@@ -129,11 +134,12 @@ public final class ProfileManager {
         boolean wasDefault = profile.isDefault();
         profile.setName(newName);
         profile.setUpdatedAt(Instant.now());
-        writeProfileToFile(profile);
 
         if (wasDefault) {
             KeybindPlusConfig.get().setDefaultProfile(newName);
         }
+        syncDefaultFlags();
+        writeProfileToFile(profile);
         return true;
     }
 
@@ -143,7 +149,9 @@ public final class ProfileManager {
         if (getProfile(newName) != null) return null;
 
         KeybindProfile copy = new KeybindProfile(newName, source.getKeybinds());
+        copy.setDefault(false);
         profiles.add(copy);
+        syncDefaultFlags();
         writeProfileToFile(copy);
         return copy;
     }
@@ -188,11 +196,15 @@ public final class ProfileManager {
                 return null;
             }
 
+            // Always ensure imported profile is not default unless it matches active default name
+            profile.setDefault(false);
+
             KeybindProfile existing = getProfile(profile.getName());
             if (existing != null) {
                 profiles.remove(existing);
             }
             profiles.add(profile);
+            syncDefaultFlags();
             writeProfileToFile(profile);
             return profile;
         } catch (IOException e) {
@@ -229,6 +241,7 @@ public final class ProfileManager {
         if (currentKeybinds.isEmpty()) return;
 
         KeybindProfile backup = new KeybindProfile("backup_" + BACKUP_FORMAT.format(Instant.now()), currentKeybinds);
+        backup.setDefault(false);
         Path backupDir = KeybindPlusConfig.getBackupsDir();
         Path backupFile = backupDir.resolve(backup.toFileName());
 
@@ -265,10 +278,8 @@ public final class ProfileManager {
     }
 
     public void setDefaultProfile(String name) {
-        for (var p : profiles) {
-            p.setDefault(p.getName().equals(name));
-        }
         KeybindPlusConfig.get().setDefaultProfile(name);
+        syncDefaultFlags();
     }
 
     public KeybindProfile getDefaultProfile() {
