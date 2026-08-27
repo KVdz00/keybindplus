@@ -1,92 +1,75 @@
-# KeybindPlus
+<div align="center">
+  <img src="common/src/main/resources/assets/keybindplus/icon.png" width="128" height="128" alt="KeybindPlus Icon" />
+  <h1>KeybindPlus</h1>
+  <p><strong>Client-side keybind profile manager, in-game editor, and conflict resolver for Minecraft.</strong></p>
 
-[![Build Status](https://github.com/KVdz00/keybindplus/actions/workflows/build.yml/badge.svg)](https://github.com/KVdz00/keybindplus/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Minecraft Version](https://img.shields.io/badge/Minecraft-26.2+-brightgreen.svg)](VERSIONS.md)
-
-KeybindPlus is a client-side Minecraft mod that lets you create, manage, and switch keybind profiles with conflict detection and an in-game keybind editor. Built with Architectury for Fabric and NeoForge.
+  [![Build Status](https://github.com/KVdz00/keybindplus/actions/workflows/build.yml/badge.svg)](https://github.com/KVdz00/keybindplus/actions)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  [![Minecraft Version](https://img.shields.io/badge/Minecraft-26.2+-brightgreen.svg)](VERSIONS.md)
+</div>
 
 ---
 
 ## Features
 
-- **Keybind Profiles**: Save your entire keybind setup into named profiles and switch between them at any time.
-- **Default Profile**: Set a profile as default to automatically apply on game launch or via a dedicated Quick Load hotkey.
-- **In-Game Keybind Editor**: Edit keybindings directly inside any profile, rebind keys with keyboard or mouse, and unbind unwanted features to free up keys.
-- **Visual Conflict Resolver**: Detects overlapping key assignments and provides a dedicated filter to resolve conflicts in one place.
-- **Profile Comparison**: Compare any profile side-by-side against your default profile to see differences.
-- **One-Click Undo**: Revert to your previous keybind configuration immediately after loading a profile.
-- **Rolling Auto-Backup**: Automatically creates rolling backups (up to 5) before applying a new profile.
-- **Import & Export**: Export profiles to JSON files and import them using your operating system's native file chooser with schema validation.
-- **Clean UI & Zero Chat Clutter**: Operates silently without spamming in-game chat. SystemToast notifications are reserved strictly for external file import and export operations.
+- **Named Profiles**: Save, rename, duplicate, and switch complete keybind configurations on the fly.
+- **In-Game Editor**: Rebind or unbind keys (`NONE`) directly within profiles without opening vanilla menus.
+- **Visual Conflict Resolver**: Automatically detects key overlaps and filters conflicting keybinds in red.
+- **Quick Load & Default**: Set a primary profile that loads automatically on startup or via a single hotkey.
+- **Safety First**: Instant one-click undo and automatic rolling backups before loading profiles.
+- **Seamless File I/O**: Native file dialog for importing and exporting `.json` profiles with schema validation.
+- **Zero Chat Clutter**: Silent operation with no chat spam; toast notifications are restricted to file imports/exports.
 
 ---
 
-## Supported Versions
-
-KeybindPlus actively supports modern Minecraft versions and maintains separate branches for legacy releases (down to 1.17.x and 1.8.9 PvP). See [VERSIONS.md](VERSIONS.md) for the full version matrix and branching roadmap.
-
----
-
-## Requirements
-
-- **Minecraft**: 26.2+
-- **Java**: 25+
-- **Mod Loader**: Fabric Loader (>= 0.19.0) or NeoForge (>= 26.2)
-- **Dependencies**: Architectury API, Fabric API (on Fabric)
-
----
-
-## Default Controls
+## Controls
 
 | Action | Default Key | Description |
 | :--- | :--- | :--- |
-| Open KeybindPlus Menu | `V` | Opens the profile manager and editor screen. |
-| Quick Load Default Profile | *Unbound* | Instantly applies the default profile in-game. |
+| **Open KeybindPlus** | `V` | Opens the main profile management and editor interface. |
+| **Quick Load Default** | *Unbound* | Instantly applies your default profile during gameplay. |
 
-*Keys can be reconfigured in Options -> Controls -> Key Binds -> KeybindPlus.*
+*Rebindable in Minecraft Options -> Controls -> Key Binds -> KeybindPlus.*
 
 ---
 
-## Profile Storage
+## Installation & Requirements
 
-Profiles and configuration files are stored locally in:
-- `.minecraft/config/keybindplus/profiles/` (Active profiles)
-- `.minecraft/config/keybindplus/exports/` (Exported profiles)
-- `.minecraft/config/keybindplus/imports/` (Import folder)
-- `.minecraft/config/keybindplus/backups/` (Automatic rolling backups)
+- **Supported Loaders**: Fabric Loader (`>=0.19.0`) & NeoForge (`>=26.2`)
+- **Required Dependencies**: Architectury API, Fabric API (Fabric only)
+- **Java Runtime**: Java 25+
+- **Minecraft Version**: 26.2+ *(See [VERSIONS.md](VERSIONS.md) for 1.17–1.21 and 1.8.9 legacy roadmap)*
+
+Place the compiled `.jar` file into your `.minecraft/mods/` directory and launch the game.
+
+---
+
+## Storage Structure
+
+Configuration files and profiles are stored in:
+```text
+.minecraft/config/keybindplus/
+├── profiles/    # Saved keybind profiles (.json)
+├── backups/     # Automatic rolling backups (up to 5)
+├── exports/     # Exported profiles for sharing
+└── imports/     # Default folder for imported profiles
+```
 
 ---
 
 ## Building from Source
 
-To build KeybindPlus locally:
-
 ```bash
-# Clone the repository
 git clone https://github.com/KVdz00/keybindplus.git
 cd keybindplus
-
-# Build all platforms
 ./gradlew build
-
-# Build Fabric only
-./gradlew :fabric:build
-
-# Build NeoForge only
-./gradlew :neoforge:build
 ```
 
-Compiled JAR files will be located in `<loader>/build/libs/`.
+Compiled JARs will be generated in `fabric/build/libs/` and `neoforge/build/libs/`.
 
 ---
 
-## Contributing
+## License & Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code style, branching strategy, and pull request process.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+- Distributed under the [MIT License](LICENSE).
+- Contribution guidelines and code standards are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
