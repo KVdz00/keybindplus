@@ -48,11 +48,6 @@ public class SaveProfilePopup extends Screen {
         if (!name.isEmpty()) {
             onSave.accept(name);
             this.minecraft.setScreenAndShow(parent);
-        } else {
-            if (this.minecraft.player != null) {
-                this.minecraft.player.sendSystemMessage(
-                    Component.translatable("keybindplus.chat.error", "Profile name cannot be empty!"));
-            }
         }
     }
 
