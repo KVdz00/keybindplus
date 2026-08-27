@@ -148,7 +148,6 @@ public class KeybindPlusScreen extends Screen {
     private void onOpenFolder() {
         Path configDir = KeybindPlusConfig.getConfigDir();
         Util.getPlatform().openPath(configDir);
-        ToastNotification.toast("keybindplus.toast.open_folder", "keybindplus.toast.open_folder");
     }
 
     private void onSave() {
@@ -159,15 +158,11 @@ public class KeybindPlusScreen extends Screen {
                     Component.translatable("keybindplus.popup.confirm_overwrite", name),
                     () -> {
                         pm.saveProfile(name);
-                        ToastNotification.toast("keybindplus.toast.saved_title",
-                            "keybindplus.toast.saved_desc", name);
                         refreshList();
                     }
                 ));
             } else {
                 pm.saveProfile(name);
-                ToastNotification.toast("keybindplus.toast.saved_title",
-                    "keybindplus.toast.saved_desc", name);
                 refreshList();
             }
         }));
@@ -175,11 +170,7 @@ public class KeybindPlusScreen extends Screen {
 
     public void onLoad() {
         KeybindProfile profile = profileList.getSelectedProfile();
-        if (profile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (profile == null) return;
 
         List<KeyConflict> conflicts = ConflictDetector.detect(profile);
         if (!conflicts.isEmpty()) {
@@ -193,38 +184,24 @@ public class KeybindPlusScreen extends Screen {
 
     private void applyProfile(KeybindProfile profile) {
         ProfileManager.get().createAutoBackup();
-        ApplyResult result = KeybindApplier.apply(profile);
-        ToastNotification.toast("keybindplus.toast.loaded_title",
-            "keybindplus.toast.loaded_desc", profile.getName());
+        KeybindApplier.apply(profile);
         onSelectionUpdated();
     }
 
     private void onUndo() {
-        if (!KeybindApplier.hasUndoSnapshot()) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_undo");
-            return;
-        }
+        if (!KeybindApplier.hasUndoSnapshot()) return;
         KeybindApplier.undoLastApply();
-        ToastNotification.toast("keybindplus.toast.undo_title",
-            "keybindplus.toast.undo_desc");
         onSelectionUpdated();
     }
 
     private void onDelete() {
         KeybindProfile profile = profileList.getSelectedProfile();
-        if (profile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (profile == null) return;
 
         this.minecraft.setScreenAndShow(new ConfirmPopup(this,
             Component.translatable("keybindplus.popup.confirm_delete", profile.getName()),
             () -> {
                 ProfileManager.get().deleteProfile(profile.getName());
-                ToastNotification.toast("keybindplus.toast.deleted_title",
-                    "keybindplus.toast.deleted_desc", profile.getName());
                 refreshList();
             }
         ));
@@ -232,11 +209,7 @@ public class KeybindPlusScreen extends Screen {
 
     private void onExport() {
         KeybindProfile profile = profileList.getSelectedProfile();
-        if (profile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (profile == null) return;
 
         Path path = ProfileManager.get().exportProfile(profile.getName());
         if (path != null) {
@@ -290,80 +263,44 @@ public class KeybindPlusScreen extends Screen {
 
     private void onRename() {
         KeybindProfile profile = profileList.getSelectedProfile();
-        if (profile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (profile == null) return;
 
         String oldName = profile.getName();
         this.minecraft.setScreenAndShow(new SaveProfilePopup(this, newName -> {
             if (newName.equals(oldName)) return;
             boolean success = ProfileManager.get().renameProfile(oldName, newName);
             if (success) {
-                ToastNotification.toast("keybindplus.toast.renamed_title",
-                    "keybindplus.toast.renamed_desc", oldName, newName);
                 refreshList();
-            } else {
-                ToastNotification.toast("keybindplus.toast.error_title",
-                    "keybindplus.toast.renamed_desc", "Name already exists");
             }
         }));
     }
 
     private void onDuplicate() {
         KeybindProfile profile = profileList.getSelectedProfile();
-        if (profile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (profile == null) return;
 
         this.minecraft.setScreenAndShow(new SaveProfilePopup(this, newName -> {
             KeybindProfile copy = ProfileManager.get().duplicateProfile(profile.getName(), newName);
             if (copy != null) {
-                ToastNotification.toast("keybindplus.toast.duplicated_title",
-                    "keybindplus.toast.duplicated_desc", newName);
                 refreshList();
-            } else {
-                ToastNotification.toast("keybindplus.toast.error_title",
-                    "keybindplus.toast.duplicated_desc", "Name already exists");
             }
         }));
     }
 
     private void onCompare() {
         KeybindProfile selected = profileList.getSelectedProfile();
-        if (selected == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (selected == null) return;
         KeybindProfile defaultProfile = ProfileManager.get().getDefaultProfile();
-        if (defaultProfile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_default");
-            return;
-        }
-        if (selected.getName().equals(defaultProfile.getName())) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_default");
-            return;
-        }
+        if (defaultProfile == null) return;
+        if (selected.getName().equals(defaultProfile.getName())) return;
 
         this.minecraft.setScreenAndShow(new CompareScreen(this, selected, defaultProfile));
     }
 
     private void onSetDefault() {
         KeybindProfile profile = profileList.getSelectedProfile();
-        if (profile == null) {
-            ToastNotification.toast("keybindplus.toast.error_title",
-                "keybindplus.toast.no_selection");
-            return;
-        }
+        if (profile == null) return;
         ProfileManager.get().setDefaultProfile(profile.getName());
-        ToastNotification.toast("keybindplus.toast.default_set_title",
-            "keybindplus.toast.default_set_desc", profile.getName());
         refreshList();
     }
 
