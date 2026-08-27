@@ -1,5 +1,9 @@
 # KeybindPlus
 
+[![Build Status](https://github.com/KVdz00/keybindplus/actions/workflows/build.yml/badge.svg)](https://github.com/KVdz00/keybindplus/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Minecraft Version](https://img.shields.io/badge/Minecraft-26.2+-brightgreen.svg)](VERSIONS.md)
+
 KeybindPlus is a client-side Minecraft mod that lets you create, manage, and switch keybind profiles with conflict detection and an in-game keybind editor. Built with Architectury for Fabric and NeoForge.
 
 ---
