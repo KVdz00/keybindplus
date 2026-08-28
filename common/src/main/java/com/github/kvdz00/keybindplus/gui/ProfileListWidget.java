@@ -22,6 +22,11 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
         this.parentScreen = parentScreen;
     }
 
+    @Override
+    public int getRowWidth() {
+        return Math.min(308, this.width - 20);
+    }
+
     public void updateEntries(List<KeybindProfile> profiles) {
         KeybindProfile prevSelected = getSelectedProfile();
         this.clearEntries();

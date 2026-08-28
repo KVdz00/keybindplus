@@ -92,6 +92,19 @@ public final class ProfileManager {
         return profile;
     }
 
+    public void updateProfile(KeybindProfile profile) {
+        if (profile == null) return;
+        KeybindProfile existing = getProfile(profile.getName());
+        if (existing != null && existing != profile) {
+            existing.setKeybinds(profile.getKeybinds());
+            existing.setUpdatedAt(profile.getUpdatedAt());
+        } else if (existing == null) {
+            profiles.add(profile);
+        }
+        syncDefaultFlags();
+        writeProfileToFile(profile);
+    }
+
     public KeybindProfile getProfile(String name) {
         return profiles.stream()
             .filter(p -> p.getName().equals(name))

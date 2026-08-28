@@ -82,11 +82,16 @@ public class CompareScreen extends Screen {
     }
 
     private String shortenKey(String keyName) {
+        if (keyName == null || keyName.isBlank() || keyName.equals("key.keyboard.unknown") || keyName.equalsIgnoreCase("none")) {
+            return "NONE";
+        }
         return keyName
             .replace("key.keyboard.", "")
             .replace("key.mouse.", "Mouse ")
             .replace("left.", "L-")
             .replace("right.", "R-")
+            .replace('.', ' ')
+            .replace('_', ' ')
             .toUpperCase();
     }
 

@@ -8,7 +8,7 @@ KeybindPlus follows standard Minecraft modding practices by maintaining version-
 
 | Minecraft Version | Branch | Mod Loader(s) | Status | Java Version |
 | :--- | :--- | :--- | :--- | :--- |
-| **26.2 (Active)** | `main` | Fabric, NeoForge | Supported (v1.1.0) | Java 25 |
+| **26.2 (Active)** | `main` | Fabric, NeoForge | Supported (v1.1.1) | Java 25 |
 | **1.21.x** | `1.21.x` | Fabric, NeoForge | Planned | Java 21 |
 | **1.20.x** | `1.20.x` | Fabric, Forge / NeoForge | Planned | Java 17 |
 | **1.19.x** | `1.19.x` | Fabric, Forge | Planned | Java 17 |

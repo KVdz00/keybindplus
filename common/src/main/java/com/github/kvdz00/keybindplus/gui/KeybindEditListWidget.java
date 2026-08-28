@@ -22,6 +22,11 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         this.screen = screen;
     }
 
+    @Override
+    public int getRowWidth() {
+        return Math.min(330, this.width - 20);
+    }
+
     public void setEntries(List<KeybindRowData> rows, Set<String> conflictedKeys, String activeRebindAction) {
         this.clearEntries();
         for (KeybindRowData row : rows) {
@@ -75,31 +80,34 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         @Override
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
                                    boolean hovered, float delta) {
-            int rowX = this.getX() + 8;
+            int rowX = this.getX() + 4;
             int rowY = this.getY();
+            int rowWidth = KeybindEditListWidget.this.getRowWidth();
 
             // Position buttons on the right side
-            int rightX = this.getX() + this.getWidth() - 145;
-            this.keyButton.setX(rightX);
-            this.keyButton.setY(rowY + 2);
+            int unbindX = this.getX() + rowWidth - 46;
+            int keyX = unbindX - 88;
+
+            this.keyButton.setX(keyX);
+            this.keyButton.setY(rowY + 4);
             this.keyButton.extractRenderState(graphics, mouseX, mouseY, delta);
 
-            this.unbindButton.setX(rightX + 88);
-            this.unbindButton.setY(rowY + 2);
+            this.unbindButton.setX(unbindX);
+            this.unbindButton.setY(rowY + 4);
             this.unbindButton.extractRenderState(graphics, mouseX, mouseY, delta);
 
             // Action name (left side)
             MutableComponent actionText = Component.translatable(data.actionId());
             if (isListening()) {
-                actionText = actionText.withStyle(ChatFormatting.YELLOW);
+                actionText = actionText.withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
             }
 
-            graphics.textRenderer().accept(rowX, rowY + 3, actionText);
+            graphics.textRenderer().accept(rowX, rowY + 4, actionText);
 
             // Category tag (small below action name)
             String cat = data.category();
             if (cat != null && !cat.isBlank()) {
-                graphics.textRenderer().accept(rowX, rowY + 13,
+                graphics.textRenderer().accept(rowX, rowY + 15,
                     Component.literal(cat).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
@@ -122,6 +130,7 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
     private static boolean isUnknownKey(String keyName) {
         return keyName == null || keyName.isBlank()
             || keyName.equals("key.keyboard.unknown")
+            || keyName.equalsIgnoreCase("none")
             || keyName.equals(InputConstants.UNKNOWN.getName());
     }
 
@@ -130,7 +139,8 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         return key
             .replace("key.keyboard.", "")
             .replace("key.mouse.", "Mouse ")
-            .replace("_", " ")
+            .replace('.', ' ')
+            .replace('_', ' ')
             .toUpperCase();
     }
 }

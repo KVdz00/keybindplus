@@ -71,6 +71,11 @@ public class ConflictWarningPopup extends Screen {
             super(minecraft, width, height, top, itemHeight);
         }
 
+        @Override
+        public int getRowWidth() {
+            return Math.min(308, this.width - 20);
+        }
+
         public void addConflict(KeyConflict conflict) {
             this.addEntry(new ConflictEntry(conflict));
         }
@@ -89,7 +94,7 @@ public class ConflictWarningPopup extends Screen {
                 String actionsDisplay = String.join(", ", conflict.actions().stream()
                     .map(this::formatAction).toList());
 
-                graphics.textRenderer().accept(this.getX() + 10, this.getY() + 4,
+                graphics.textRenderer().accept(this.getX() + 6, this.getY() + 4,
                     Component.literal(keyDisplay + "  ->  " + actionsDisplay));
             }
 
@@ -102,6 +107,8 @@ public class ConflictWarningPopup extends Screen {
                 return key
                     .replace("key.keyboard.", "")
                     .replace("key.mouse.", "Mouse ")
+                    .replace('.', ' ')
+                    .replace('_', ' ')
                     .toUpperCase();
             }
 

@@ -69,7 +69,7 @@ public class KeybindEditorScreen extends Screen {
 
         // Keybind scroll list
         this.listWidget = new KeybindEditListWidget(this.minecraft, this,
-            this.width, this.height - 86, 48, 24);
+            this.width, this.height - 86, 48, 28);
         this.addRenderableWidget(this.listWidget);
 
         // Bottom action buttons
@@ -206,7 +206,7 @@ public class KeybindEditorScreen extends Screen {
     private void saveChanges() {
         profile.setKeybinds(workingKeybinds);
         profile.setUpdatedAt(Instant.now());
-        ProfileManager.get().saveProfile(profile.getName());
+        ProfileManager.get().updateProfile(profile);
     }
 
     private static boolean isUnknownKey(String keyName) {

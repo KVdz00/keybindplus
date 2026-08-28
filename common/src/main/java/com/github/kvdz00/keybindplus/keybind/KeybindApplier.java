@@ -45,7 +45,12 @@ public final class KeybindApplier {
             }
 
             try {
-                InputConstants.Key key = InputConstants.getKey(keyName);
+                InputConstants.Key key;
+                if (keyName == null || keyName.isBlank() || keyName.equals("key.keyboard.unknown") || keyName.equalsIgnoreCase("none")) {
+                    key = InputConstants.UNKNOWN;
+                } else {
+                    key = InputConstants.getKey(keyName);
+                }
                 mapping.setKey(key);
                 applied++;
             } catch (Exception e) {
@@ -83,7 +88,13 @@ public final class KeybindApplier {
                 continue;
             }
             try {
-                InputConstants.Key key = InputConstants.getKey(entry.getValue());
+                String val = entry.getValue();
+                InputConstants.Key key;
+                if (val == null || val.isBlank() || val.equals("key.keyboard.unknown") || val.equalsIgnoreCase("none")) {
+                    key = InputConstants.UNKNOWN;
+                } else {
+                    key = InputConstants.getKey(val);
+                }
                 mapping.setKey(key);
                 restored++;
             } catch (Exception e) {
