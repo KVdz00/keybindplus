@@ -12,13 +12,19 @@ import java.util.function.Consumer;
 
 public class SaveProfilePopup extends Screen {
     private final Screen parent;
+    private final String initialValue;
     private final Consumer<String> onSave;
     private EditBox nameField;
 
-    public SaveProfilePopup(Screen parent, Consumer<String> onSave) {
-        super(Component.translatable("keybindplus.popup.save_title"));
+    public SaveProfilePopup(Screen parent, Component title, String initialValue, Consumer<String> onSave) {
+        super(title);
         this.parent = parent;
+        this.initialValue = initialValue != null ? initialValue : "";
         this.onSave = onSave;
+    }
+
+    public SaveProfilePopup(Screen parent, Consumer<String> onSave) {
+        this(parent, Component.translatable("keybindplus.popup.save_title"), "", onSave);
     }
 
     @Override
@@ -29,6 +35,10 @@ public class SaveProfilePopup extends Screen {
         this.nameField = new EditBox(this.font, centerX - 100, centerY - 10, 200, 20,
             Component.translatable("keybindplus.popup.save_name"));
         this.nameField.setMaxLength(64);
+        if (!this.initialValue.isEmpty()) {
+            this.nameField.setValue(this.initialValue);
+            this.nameField.setHighlightPos(0);
+        }
         this.addRenderableWidget(this.nameField);
         this.setInitialFocus(this.nameField);
 

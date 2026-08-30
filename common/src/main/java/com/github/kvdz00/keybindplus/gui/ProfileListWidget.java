@@ -27,6 +27,10 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
         return Math.min(308, this.width - 20);
     }
 
+    public boolean isEmpty() {
+        return this.getItemCount() == 0;
+    }
+
     public void updateEntries(List<KeybindProfile> profiles) {
         KeybindProfile prevSelected = getSelectedProfile();
         this.clearEntries();
@@ -76,9 +80,18 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
         @Override
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
                                    boolean hovered, float delta) {
-            MutableComponent title = Component.literal(profile.getName()).withStyle(ChatFormatting.WHITE);
+            ChatFormatting nameColor;
+            if (profile.isLoaded()) {
+                nameColor = ChatFormatting.GREEN;
+            } else if (profile.isImported()) {
+                nameColor = ChatFormatting.AQUA;
+            } else {
+                nameColor = ChatFormatting.WHITE;
+            }
+
+            MutableComponent title = Component.literal(profile.getName()).withStyle(nameColor);
             if (profile.isDefault()) {
-                title.append(Component.literal(" [DEFAULT]").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+                title.append(Component.literal(" \u2605").withStyle(ChatFormatting.GOLD));
             }
 
             int keyCount = profile.getKeybinds().size();

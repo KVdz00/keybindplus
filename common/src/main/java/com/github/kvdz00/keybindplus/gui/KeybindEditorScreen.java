@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -28,15 +29,19 @@ public class KeybindEditorScreen extends Screen {
     private KeybindEditListWidget listWidget;
     private EditBox searchField;
     private Button filterButton;
-    private boolean conflictsOnly;
     private String activeRebindAction = null;
+    private boolean conflictsOnly = false;
+
+    public KeybindEditorScreen(Screen parent, KeybindProfile profile) {
+        this(parent, profile, false);
+    }
 
     public KeybindEditorScreen(Screen parent, KeybindProfile profile, boolean startWithConflictsOnly) {
         super(Component.translatable("keybindplus.editor.title", profile.getName()));
         this.parent = parent;
         this.profile = profile;
-        this.workingKeybinds = new LinkedHashMap<>(profile.getKeybinds());
         this.conflictsOnly = startWithConflictsOnly;
+        this.workingKeybinds = new LinkedHashMap<>(profile.getKeybinds());
 
         // Cache category names from game options
         var options = net.minecraft.client.Minecraft.getInstance().options;
@@ -65,7 +70,9 @@ public class KeybindEditorScreen extends Screen {
                 this.filterButton.setMessage(getFilterButtonLabel());
                 refreshList();
             }
-        ).bounds(centerX + 24, 25, 130, 20).build());
+        ).bounds(centerX + 24, 25, 130, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.editor_filter")))
+        .build());
 
         // Keybind scroll list
         this.listWidget = new KeybindEditListWidget(this.minecraft, this,
@@ -77,12 +84,16 @@ public class KeybindEditorScreen extends Screen {
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.editor.save_apply"),
             btn -> onSaveAndApply()
-        ).bounds(centerX - 154, btnY, 100, 20).build());
+        ).bounds(centerX - 154, btnY, 100, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.editor_save_apply")))
+        .build());
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.save"),
             btn -> onSaveOnly()
-        ).bounds(centerX - 50, btnY, 96, 20).build());
+        ).bounds(centerX - 50, btnY, 96, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.save")))
+        .build());
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
@@ -93,26 +104,36 @@ public class KeybindEditorScreen extends Screen {
     }
 
     private Component getFilterButtonLabel() {
-        Set<String> conflicts = calculateConflicts();
+        int conflictCount = calculateConflictMap().size();
         return conflictsOnly
-            ? Component.translatable("keybindplus.editor.filter_conflicts", conflicts.size())
+            ? Component.translatable("keybindplus.editor.filter_conflicts", conflictCount)
             : Component.translatable("keybindplus.editor.filter_all", workingKeybinds.size());
     }
 
-    private Set<String> calculateConflicts() {
-        Map<String, Integer> keyCounts = new HashMap<>();
-        for (String key : workingKeybinds.values()) {
-            if (isUnknownKey(key)) continue;
-            keyCounts.put(key, keyCounts.getOrDefault(key, 0) + 1);
+    private Map<String, List<String>> calculateConflictMap() {
+        Map<String, List<String>> keyToActions = new HashMap<>();
+        for (var e : workingKeybinds.entrySet()) {
+            if (isUnknownKey(e.getValue())) continue;
+            keyToActions.computeIfAbsent(e.getValue(), k -> new ArrayList<>()).add(e.getKey());
         }
-        return keyCounts.entrySet().stream()
-            .filter(e -> e.getValue() > 1)
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
+
+        Map<String, List<String>> conflictMap = new HashMap<>();
+        for (var entry : keyToActions.entrySet()) {
+            List<String> actions = entry.getValue();
+            if (actions.size() > 1) {
+                for (String action : actions) {
+                    List<String> others = actions.stream()
+                        .filter(a -> !a.equals(action))
+                        .collect(Collectors.toList());
+                    conflictMap.put(action, others);
+                }
+            }
+        }
+        return conflictMap;
     }
 
     private void refreshList() {
-        Set<String> conflictedKeys = calculateConflicts();
+        Map<String, List<String>> conflictMap = calculateConflictMap();
         String query = searchField != null ? searchField.getValue().toLowerCase().trim() : "";
 
         List<KeybindEditListWidget.KeybindRowData> rows = new ArrayList<>();
@@ -122,7 +143,7 @@ public class KeybindEditorScreen extends Screen {
             String category = actionCategories.getOrDefault(actionId, "");
 
             // Filter conflicts
-            if (conflictsOnly && !conflictedKeys.contains(keyName)) {
+            if (conflictsOnly && !conflictMap.containsKey(actionId)) {
                 continue;
             }
 
@@ -144,7 +165,7 @@ public class KeybindEditorScreen extends Screen {
         }
 
         if (listWidget != null) {
-            listWidget.setEntries(rows, conflictedKeys, activeRebindAction);
+            listWidget.setEntries(rows, conflictMap, activeRebindAction);
         }
     }
 

@@ -1,26 +1,62 @@
 package com.github.kvdz00.keybindplus.gui;
 
+import com.github.kvdz00.keybindplus.KeybindPlusClient;
 import com.github.kvdz00.keybindplus.config.KeybindPlusConfig;
 import com.github.kvdz00.keybindplus.keybind.*;
 import com.github.kvdz00.keybindplus.profile.*;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class KeybindPlusScreen extends Screen {
+    public enum SortMode {
+        AZ("keybindplus.sort.az", "A-Z"),
+        ZA("keybindplus.sort.za", "Z-A"),
+        NEWEST("keybindplus.sort.newest", "Newest"),
+        OLDEST("keybindplus.sort.oldest", "Oldest"),
+        IMPORTED("keybindplus.sort.imported", "Imported"),
+        LOCAL("keybindplus.sort.local", "Local");
+
+        private final String langKey;
+        private final String label;
+
+        SortMode(String langKey, String label) {
+            this.langKey = langKey;
+            this.label = label;
+        }
+
+        public Component getDisplayName() {
+            return Component.translatable(langKey);
+        }
+
+        public SortMode next() {
+            SortMode[] values = values();
+            return values[(this.ordinal() + 1) % values.length];
+        }
+    }
+
+    private SortMode currentSort = SortMode.AZ;
     private ProfileListWidget profileList;
     private EditBox searchField;
+    private Button sortButton;
     private Button loadButton;
     private Button editButton;
     private Button undoButton;
@@ -43,96 +79,164 @@ public class KeybindPlusScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        // Search field
-        this.searchField = new EditBox(this.font, centerX - 100, 26, 200, 18,
+        // Top Row: Search field (168px), Sort button (68px), Folder button (64px) -> Total 308px
+        this.searchField = new EditBox(this.font, centerX - 154, 26, 168, 18,
             Component.translatable("keybindplus.screen.search"));
         this.searchField.setHint(Component.translatable("keybindplus.screen.search"));
         this.searchField.setResponder(query -> refreshList());
         this.addRenderableWidget(this.searchField);
+
+        this.sortButton = this.addRenderableWidget(Button.builder(
+            currentSort.getDisplayName(),
+            btn -> {
+                currentSort = currentSort.next();
+                btn.setMessage(currentSort.getDisplayName());
+                btn.setTooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.sort", currentSort.getDisplayName())));
+                refreshList();
+            }
+        ).bounds(centerX + 18, 25, 68, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.sort", currentSort.getDisplayName())))
+        .build());
+
+        this.openFolderButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.open_folder"),
+            btn -> onOpenFolder()
+        ).bounds(centerX + 90, 25, 64, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.open_folder")))
+        .build());
 
         // Profile list
         this.profileList = new ProfileListWidget(this.minecraft, this,
             this.width, this.height - 134, 48, 28);
         this.addRenderableWidget(this.profileList);
 
-        // Row 1: Core Primary Actions (3 wide buttons)
+        // Row 1: Core Primary Actions (3 buttons, 100px each, gap 4px = 308px)
         int btnY1 = this.height - 76;
         this.loadButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.load"),
             btn -> onLoad()
-        ).bounds(centerX - 154, btnY1, 100, 20).build());
+        ).bounds(centerX - 154, btnY1, 100, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.load")))
+        .build());
 
         this.editButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.edit"),
             btn -> onEdit()
-        ).bounds(centerX - 50, btnY1, 100, 20).build());
+        ).bounds(centerX - 50, btnY1, 100, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.edit")))
+        .build());
 
         this.undoButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.undo"),
             btn -> onUndo()
-        ).bounds(centerX + 54, btnY1, 100, 20).build());
+        ).bounds(centerX + 54, btnY1, 100, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.undo")))
+        .build());
 
-        // Row 2: Profile Management Actions (6 buttons)
+        // Row 2: Profile Management Actions (4 buttons, 74px each, gap 4px = 308px)
         int btnY2 = this.height - 52;
         this.saveButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.save"),
             btn -> onSave()
-        ).bounds(centerX - 154, btnY2, 74, 20).build());
-
-        this.compareButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.compare"),
-            btn -> onCompare()
-        ).bounds(centerX - 76, btnY2, 54, 20).build());
-
-        this.setDefaultButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.set_default"),
-            btn -> onSetDefault()
-        ).bounds(centerX - 18, btnY2, 50, 20).build());
-
-        this.renameButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.rename"),
-            btn -> onRename()
-        ).bounds(centerX + 36, btnY2, 48, 20).build());
+        ).bounds(centerX - 154, btnY2, 74, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.save")))
+        .build());
 
         this.duplicateButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.duplicate"),
             btn -> onDuplicate()
-        ).bounds(centerX + 88, btnY2, 40, 20).build());
+        ).bounds(centerX - 76, btnY2, 74, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.duplicate")))
+        .build());
+
+        this.renameButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.rename"),
+            btn -> onRename()
+        ).bounds(centerX + 2, btnY2, 74, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.rename")))
+        .build());
 
         this.deleteButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.delete"),
             btn -> onDelete()
-        ).bounds(centerX + 132, btnY2, 40, 20).build());
+        ).bounds(centerX + 80, btnY2, 74, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.delete")))
+        .build());
 
-        // Row 3: File I/O & Navigation (4 evenly spaced buttons)
+        // Row 3: Tools & Navigation (5 buttons, 58px each, gap 4px = 306px, centered)
         int btnY3 = this.height - 28;
-        this.openFolderButton = this.addRenderableWidget(Button.builder(
-            Component.translatable("keybindplus.screen.open_folder"),
-            btn -> onOpenFolder()
-        ).bounds(centerX - 154, btnY3, 74, 20).build());
+        this.compareButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.compare"),
+            btn -> onCompare()
+        ).bounds(centerX - 153, btnY3, 58, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.compare")))
+        .build());
+
+        this.setDefaultButton = this.addRenderableWidget(Button.builder(
+            Component.translatable("keybindplus.screen.set_default"),
+            btn -> onSetDefault()
+        ).bounds(centerX - 91, btnY3, 58, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.set_default")))
+        .build());
 
         this.importButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.import"),
             btn -> onImport()
-        ).bounds(centerX - 76, btnY3, 74, 20).build());
+        ).bounds(centerX - 29, btnY3, 58, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.import")))
+        .build());
 
         this.exportButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.export"),
             btn -> onExport()
-        ).bounds(centerX + 2, btnY3, 74, 20).build());
+        ).bounds(centerX + 33, btnY3, 58, 20)
+        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.export")))
+        .build());
 
         this.doneButton = this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.done"),
             btn -> this.onClose()
-        ).bounds(centerX + 80, btnY3, 74, 20).build());
+        ).bounds(centerX + 95, btnY3, 58, 20).build());
 
         refreshList();
+    }
+
+    public String getSearchQuery() {
+        return searchField != null ? searchField.getValue() : "";
     }
 
     private void refreshList() {
         ProfileManager pm = ProfileManager.get();
         String query = searchField != null ? searchField.getValue() : "";
-        List<KeybindProfile> profiles = pm.searchProfiles(query);
+        List<KeybindProfile> profiles = new ArrayList<>(pm.searchProfiles(query));
+
+        if (currentSort == SortMode.IMPORTED) {
+            profiles = profiles.stream().filter(KeybindProfile::isImported).collect(Collectors.toList());
+        } else if (currentSort == SortMode.LOCAL) {
+            profiles = profiles.stream().filter(p -> !p.isImported()).collect(Collectors.toList());
+        }
+
+        switch (currentSort) {
+            case AZ, IMPORTED, LOCAL -> profiles.sort(Comparator.comparing(KeybindProfile::getName, String.CASE_INSENSITIVE_ORDER));
+            case ZA -> profiles.sort(Comparator.comparing(KeybindProfile::getName, String.CASE_INSENSITIVE_ORDER).reversed());
+            case NEWEST -> profiles.sort((a, b) -> {
+                Instant tA = a.getUpdatedAt() != null ? a.getUpdatedAt() : a.getCreatedAt();
+                Instant tB = b.getUpdatedAt() != null ? b.getUpdatedAt() : b.getCreatedAt();
+                if (tA == null && tB == null) return 0;
+                if (tA == null) return 1;
+                if (tB == null) return -1;
+                return tB.compareTo(tA);
+            });
+            case OLDEST -> profiles.sort((a, b) -> {
+                Instant tA = a.getUpdatedAt() != null ? a.getUpdatedAt() : a.getCreatedAt();
+                Instant tB = b.getUpdatedAt() != null ? b.getUpdatedAt() : b.getCreatedAt();
+                if (tA == null && tB == null) return 0;
+                if (tA == null) return 1;
+                if (tB == null) return -1;
+                return tA.compareTo(tB);
+            });
+        }
+
         profileList.updateEntries(profiles);
         onSelectionUpdated();
     }
@@ -146,7 +250,20 @@ public class KeybindPlusScreen extends Screen {
         if (renameButton != null) renameButton.active = hasSelection;
         if (duplicateButton != null) duplicateButton.active = hasSelection;
         if (deleteButton != null) deleteButton.active = hasSelection;
-        if (setDefaultButton != null) setDefaultButton.active = hasSelection;
+        if (setDefaultButton != null) {
+            setDefaultButton.active = hasSelection;
+            if (hasSelection) {
+                KeybindProfile selected = profileList.getSelectedProfile();
+                boolean isDef = selected != null && selected.isDefault();
+                if (isDef) {
+                    setDefaultButton.setMessage(Component.translatable("keybindplus.screen.unset_default"));
+                    setDefaultButton.setTooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.unset_default")));
+                } else {
+                    setDefaultButton.setMessage(Component.translatable("keybindplus.screen.set_default"));
+                    setDefaultButton.setTooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.set_default")));
+                }
+            }
+        }
         if (undoButton != null) undoButton.active = KeybindApplier.hasUndoSnapshot();
     }
 
@@ -156,21 +273,26 @@ public class KeybindPlusScreen extends Screen {
     }
 
     private void onSave() {
-        this.minecraft.setScreenAndShow(new SaveProfilePopup(this, name -> {
-            ProfileManager pm = ProfileManager.get();
-            if (pm.profileExists(name)) {
-                this.minecraft.setScreenAndShow(new ConfirmPopup(this,
-                    Component.translatable("keybindplus.popup.confirm_overwrite", name),
-                    () -> {
-                        pm.saveProfile(name);
-                        refreshList();
-                    }
-                ));
-            } else {
-                pm.saveProfile(name);
-                refreshList();
+        this.minecraft.execute(() -> this.minecraft.setScreenAndShow(new SaveProfilePopup(
+            this,
+            Component.translatable("keybindplus.popup.save_title"),
+            "",
+            name -> {
+                ProfileManager pm = ProfileManager.get();
+                if (pm.profileExists(name)) {
+                    this.minecraft.setScreenAndShow(new ConfirmPopup(this,
+                        Component.translatable("keybindplus.popup.confirm_overwrite", name),
+                        () -> {
+                            pm.saveProfile(name);
+                            refreshList();
+                        }
+                    ));
+                } else {
+                    pm.saveProfile(name);
+                    refreshList();
+                }
             }
-        }));
+        )));
     }
 
     public void onLoad() {
@@ -196,13 +318,13 @@ public class KeybindPlusScreen extends Screen {
     private void applyProfile(KeybindProfile profile) {
         ProfileManager.get().createAutoBackup();
         KeybindApplier.apply(profile);
-        onSelectionUpdated();
+        refreshList();
     }
 
     private void onUndo() {
         if (!KeybindApplier.hasUndoSnapshot()) return;
         KeybindApplier.undoLastApply();
-        onSelectionUpdated();
+        refreshList();
     }
 
     private void onDelete() {
@@ -277,41 +399,67 @@ public class KeybindPlusScreen extends Screen {
         if (profile == null) return;
 
         String oldName = profile.getName();
-        this.minecraft.setScreenAndShow(new SaveProfilePopup(this, newName -> {
-            if (newName.equals(oldName)) return;
-            boolean success = ProfileManager.get().renameProfile(oldName, newName);
-            if (success) {
-                refreshList();
+        this.minecraft.execute(() -> this.minecraft.setScreenAndShow(new SaveProfilePopup(
+            this,
+            Component.translatable("keybindplus.popup.rename_title"),
+            oldName,
+            newName -> {
+                if (newName.equals(oldName)) return;
+                boolean success = ProfileManager.get().renameProfile(oldName, newName);
+                if (success) {
+                    refreshList();
+                }
             }
-        }));
+        )));
     }
 
     private void onDuplicate() {
         KeybindProfile profile = profileList.getSelectedProfile();
         if (profile == null) return;
 
-        this.minecraft.setScreenAndShow(new SaveProfilePopup(this, newName -> {
-            KeybindProfile copy = ProfileManager.get().duplicateProfile(profile.getName(), newName);
-            if (copy != null) {
-                refreshList();
+        String defaultCopyName = profile.getName() + " Copy";
+        this.minecraft.execute(() -> this.minecraft.setScreenAndShow(new SaveProfilePopup(
+            this,
+            Component.translatable("keybindplus.popup.duplicate_title"),
+            defaultCopyName,
+            newName -> {
+                KeybindProfile copy = ProfileManager.get().duplicateProfile(profile.getName(), newName);
+                if (copy != null) {
+                    refreshList();
+                }
             }
-        }));
+        )));
     }
 
     private void onCompare() {
         KeybindProfile selected = profileList.getSelectedProfile();
         if (selected == null) return;
-        KeybindProfile defaultProfile = ProfileManager.get().getDefaultProfile();
-        if (defaultProfile == null) return;
-        if (selected.getName().equals(defaultProfile.getName())) return;
 
-        this.minecraft.setScreenAndShow(new CompareScreen(this, selected, defaultProfile));
+        List<KeybindProfile> otherProfiles = ProfileManager.get().listProfiles().stream()
+            .filter(p -> !p.getName().equals(selected.getName()))
+            .collect(Collectors.toList());
+
+        if (otherProfiles.isEmpty()) {
+            ToastNotification.toast("keybindplus.toast.error_title", "keybindplus.toast.need_two_profiles");
+            return;
+        }
+
+        this.minecraft.setScreenAndShow(new CompareSelectPopup(
+            this, selected, otherProfiles,
+            target -> this.minecraft.setScreenAndShow(new CompareScreen(this, selected, target))
+        ));
     }
 
     private void onSetDefault() {
         KeybindProfile profile = profileList.getSelectedProfile();
         if (profile == null) return;
-        ProfileManager.get().setDefaultProfile(profile.getName());
+        if (profile.isDefault()) {
+            ProfileManager.get().setDefaultProfile("");
+            ToastNotification.toast("keybindplus.toast.default_cleared_title", "keybindplus.toast.default_cleared_desc");
+        } else {
+            ProfileManager.get().setDefaultProfile(profile.getName());
+            ToastNotification.toast("keybindplus.toast.default_set_title", "keybindplus.toast.default_set_desc", profile.getName());
+        }
         refreshList();
     }
 
@@ -319,6 +467,98 @@ public class KeybindPlusScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
         graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, 10, this.title);
+
+        if (profileList != null && profileList.isEmpty()) {
+            String query = getSearchQuery();
+            Component emptyText = (query != null && !query.isBlank())
+                ? Component.translatable("keybindplus.screen.no_search_results")
+                : Component.translatable("keybindplus.screen.empty");
+            graphics.textRenderer().accept(
+                TextAlignment.CENTER,
+                this.width / 2,
+                this.height / 2 - 16,
+                emptyText.copy().withStyle(net.minecraft.ChatFormatting.GRAY)
+            );
+        }
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (this.searchField != null && !this.searchField.isFocused()) {
+            if (KeybindPlusClient.OPEN_GUI_KEY.matches(event)) {
+                this.onClose();
+                return true;
+            }
+
+            KeybindProfile selected = profileList != null ? profileList.getSelectedProfile() : null;
+
+            if (event.key() == GLFW.GLFW_KEY_DELETE || event.key() == GLFW.GLFW_KEY_BACKSPACE) {
+                if (selected != null) {
+                    onDelete();
+                    return true;
+                }
+            }
+
+            if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_KP_ENTER) {
+                if (selected != null) {
+                    onLoad();
+                    return true;
+                }
+            }
+
+            boolean ctrl = isCtrlDown();
+
+            if (ctrl) {
+                if (event.key() == GLFW.GLFW_KEY_S) {
+                    onSave();
+                    return true;
+                }
+                if (event.key() == GLFW.GLFW_KEY_Z) {
+                    if (KeybindApplier.hasUndoSnapshot()) {
+                        onUndo();
+                        return true;
+                    }
+                }
+                if (event.key() == GLFW.GLFW_KEY_D) {
+                    if (selected != null) {
+                        onDuplicate();
+                        return true;
+                    }
+                }
+            } else {
+                if (event.key() == GLFW.GLFW_KEY_E) {
+                    if (selected != null) {
+                        onEdit();
+                        return true;
+                    }
+                }
+                if (event.key() == GLFW.GLFW_KEY_C) {
+                    if (selected != null) {
+                        onCompare();
+                        return true;
+                    }
+                }
+                if (event.key() == GLFW.GLFW_KEY_R) {
+                    if (selected != null) {
+                        onRename();
+                        return true;
+                    }
+                }
+                if (event.key() == GLFW.GLFW_KEY_D) {
+                    if (selected != null) {
+                        onSetDefault();
+                        return true;
+                    }
+                }
+            }
+        }
+        return super.keyPressed(event);
+    }
+
+    private static boolean isCtrlDown() {
+        long window = net.minecraft.client.Minecraft.getInstance().getWindow().handle();
+        return GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS
+            || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_CONTROL) == GLFW.GLFW_PRESS;
     }
 
     @Override

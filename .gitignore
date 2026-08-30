@@ -24,3 +24,10 @@ runs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Workspace Private Agents & Customizations
+.agents/
+
+# Local Test Fixtures & Plans
+test_fixtures/
+docs/superpowers/plans/

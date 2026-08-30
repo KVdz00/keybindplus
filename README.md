@@ -13,23 +13,40 @@
 ## Features
 
 - **Named Profiles**: Save, rename, duplicate, and switch complete keybind configurations on the fly.
-- **In-Game Editor**: Rebind or unbind keys (`NONE`) directly within profiles without opening vanilla menus.
-- **Visual Conflict Resolver**: Automatically detects key overlaps and filters conflicting keybinds in red.
-- **Quick Load & Default**: Set a primary profile that loads automatically on startup or via a single hotkey.
+- **In-Game Editor**: Rebind or unbind keys (`NONE`) directly within profiles with real-time conflict highlights and hover tooltips.
+- **Visual Compare & 1-Click Sync**: Compare any two profiles side-by-side, filter differences, and copy keybindings across profiles with single-click `<` and `>` sync buttons.
+- **Flexible Sorting & Indexing**: Cycle through 6 organization modes (`A-Z`, `Z-A`, `Newest`, `Oldest`, `Imported Only`, `Local Only`).
+- **Clean Vanilla-First UI**: Minimalist aesthetic with green active profiles, cyan imported profiles, and subtle gold star (`★`) default indicators.
+- **Quick Load & Default**: Set or unset a default profile loaded automatically on startup or via a single hotkey.
 - **Safety First**: Instant one-click undo and automatic rolling backups before loading profiles.
 - **Seamless File I/O**: Native file dialog for importing and exporting `.json` profiles with schema validation.
-- **Zero Chat Clutter**: Silent operation with no chat spam; toast notifications are restricted to file imports/exports.
+- **Zero Chat Clutter**: Silent operation with no chat spam; system toasts are restricted to async file dialogs.
 
 ---
 
-## Controls
+## Controls & Keyboard Shortcuts
 
+### Global Keybindings (In-Game)
 | Action | Default Key | Description |
 | :--- | :--- | :--- |
 | **Open KeybindPlus** | `V` | Opens the main profile management and editor interface. |
 | **Quick Load Default** | *Unbound* | Instantly applies your default profile during gameplay. |
 
 *Rebindable in Minecraft Options -> Controls -> Key Binds -> KeybindPlus.*
+
+### Menu Shortcuts (Inside KeybindPlus GUI)
+| Shortcut | Action | Description |
+| :--- | :--- | :--- |
+| `Enter` | **Load** | Apply and activate selected profile. |
+| `E` | **Edit** | Open in-game keybind editor for selected profile. |
+| `C` | **Compare** | Choose a secondary profile to compare and sync keys. |
+| `R` | **Rename** | Rename selected profile. |
+| `D` | **Default / Unset** | Toggle setting or clearing default profile status. |
+| `Delete` / `Backspace` | **Delete** | Delete selected profile with confirmation. |
+| `Ctrl + S` | **Save** | Save current active keybinds to a new profile. |
+| `Ctrl + D` | **Duplicate** | Clone selected profile. |
+| `Ctrl + Z` | **Undo** | Revert keybinds prior to last loaded profile. |
+| `V` / `Escape` | **Close** | Close KeybindPlus GUI and resume gameplay. |
 
 ---
 

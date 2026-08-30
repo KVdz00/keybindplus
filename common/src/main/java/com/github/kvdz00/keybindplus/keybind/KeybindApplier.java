@@ -2,6 +2,7 @@ package com.github.kvdz00.keybindplus.keybind;
 
 import com.github.kvdz00.keybindplus.KeybindPlus;
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
+import com.github.kvdz00.keybindplus.profile.ProfileManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 public final class KeybindApplier {
     private static Map<String, String> lastSnapshot;
+    private static String lastSnapshotLoadedProfile;
 
     private KeybindApplier() {}
 
@@ -22,6 +24,7 @@ public final class KeybindApplier {
 
     public static ApplyResult apply(KeybindProfile profile) {
         lastSnapshot = KeybindCapture.captureAll();
+        lastSnapshotLoadedProfile = ProfileManager.get().getLoadedProfile();
 
         var minecraft = Minecraft.getInstance();
         var options = minecraft.options;
@@ -62,6 +65,7 @@ public final class KeybindApplier {
         KeyMapping.resetMapping();
         options.save();
 
+        ProfileManager.get().setLoadedProfile(profile.getName());
         KeybindPlus.LOGGER.info("Applied {} keybinds, skipped {}", applied, skipped.size());
         return new ApplyResult(applied, skipped);
     }
@@ -105,6 +109,8 @@ public final class KeybindApplier {
         KeyMapping.resetMapping();
         options.save();
         lastSnapshot = null;
+        ProfileManager.get().setLoadedProfile(lastSnapshotLoadedProfile);
+        lastSnapshotLoadedProfile = null;
 
         KeybindPlus.LOGGER.info("Undo: restored {} keybinds", restored);
         return new ApplyResult(restored, skipped);

@@ -21,6 +21,7 @@ public final class ProfileManager {
 
     private static ProfileManager instance;
     private final List<KeybindProfile> profiles = new ArrayList<>();
+    private String loadedProfile = "";
 
     private ProfileManager() {}
 
@@ -32,11 +33,16 @@ public final class ProfileManager {
         return instance;
     }
 
-    public void syncDefaultFlags() {
+    public void syncFlags() {
         String defaultName = KeybindPlusConfig.get().getDefaultProfile();
         for (var p : profiles) {
             p.setDefault(!defaultName.isEmpty() && p.getName().equals(defaultName));
+            p.setLoaded(!loadedProfile.isEmpty() && p.getName().equals(loadedProfile));
         }
+    }
+
+    public void syncDefaultFlags() {
+        syncFlags();
     }
 
     public void loadAllProfiles() {
@@ -123,7 +129,10 @@ public final class ProfileManager {
             if (profile.isDefault()) {
                 KeybindPlusConfig.get().setDefaultProfile("");
             }
-            syncDefaultFlags();
+            if (profile.getName().equals(loadedProfile)) {
+                loadedProfile = "";
+            }
+            syncFlags();
             return true;
         } catch (IOException e) {
             KeybindPlus.LOGGER.error("Failed to delete profile {}: {}", name, e.getMessage());
@@ -145,13 +154,17 @@ public final class ProfileManager {
         }
 
         boolean wasDefault = profile.isDefault();
+        boolean wasLoaded = profile.getName().equals(loadedProfile);
         profile.setName(newName);
         profile.setUpdatedAt(Instant.now());
 
         if (wasDefault) {
             KeybindPlusConfig.get().setDefaultProfile(newName);
         }
-        syncDefaultFlags();
+        if (wasLoaded) {
+            loadedProfile = newName;
+        }
+        syncFlags();
         writeProfileToFile(profile);
         return true;
     }
@@ -211,6 +224,7 @@ public final class ProfileManager {
 
             // Always ensure imported profile is not default unless it matches active default name
             profile.setDefault(false);
+            profile.setImported(true);
 
             KeybindProfile existing = getProfile(profile.getName());
             if (existing != null) {
@@ -292,13 +306,26 @@ public final class ProfileManager {
 
     public void setDefaultProfile(String name) {
         KeybindPlusConfig.get().setDefaultProfile(name);
-        syncDefaultFlags();
+        syncFlags();
     }
 
     public KeybindProfile getDefaultProfile() {
         String defaultName = KeybindPlusConfig.get().getDefaultProfile();
         if (defaultName == null || defaultName.isBlank()) return null;
         return getProfile(defaultName);
+    }
+
+    public String getLoadedProfile() {
+        return loadedProfile;
+    }
+
+    public void setLoadedProfile(String name) {
+        this.loadedProfile = name != null ? name : "";
+        syncFlags();
+    }
+
+    public boolean isProfileLoaded(String name) {
+        return name != null && !name.isEmpty() && name.equals(loadedProfile);
     }
 
     private void writeProfileToFile(KeybindProfile profile) {

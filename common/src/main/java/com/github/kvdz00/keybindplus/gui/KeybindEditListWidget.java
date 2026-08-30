@@ -6,12 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindEditListWidget.KeybindEntry> {
     private final KeybindEditorScreen screen;
@@ -27,12 +29,13 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         return Math.min(330, this.width - 20);
     }
 
-    public void setEntries(List<KeybindRowData> rows, Set<String> conflictedKeys, String activeRebindAction) {
+    public void setEntries(List<KeybindRowData> rows, Map<String, List<String>> conflictMap, String activeRebindAction) {
         this.clearEntries();
         for (KeybindRowData row : rows) {
-            boolean isConflicted = conflictedKeys.contains(row.keyName());
+            List<String> conflictingActions = conflictMap.get(row.actionId());
+            boolean isConflicted = conflictingActions != null && !conflictingActions.isEmpty();
             boolean isListening = row.actionId().equals(activeRebindAction);
-            this.addEntry(new KeybindEntry(row, isConflicted, isListening));
+            this.addEntry(new KeybindEntry(row, isConflicted, conflictingActions, isListening));
         }
     }
 
@@ -44,7 +47,7 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         private final Button unbindButton;
         private final List<Button> children;
 
-        public KeybindEntry(KeybindRowData data, boolean isConflicted, boolean isListening) {
+        public KeybindEntry(KeybindRowData data, boolean isConflicted, List<String> conflictingActions, boolean isListening) {
             this.data = data;
 
             // Key display label
@@ -66,12 +69,24 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
                 screen.setActiveRebindAction(data.actionId());
             }).bounds(0, 0, 84, 20).build();
 
+            if (isConflicted && conflictingActions != null && !conflictingActions.isEmpty()) {
+                String conflictNames = conflictingActions.stream()
+                    .map(a -> Component.translatable(a).getString())
+                    .collect(Collectors.joining(", "));
+                this.keyButton.setTooltip(Tooltip.create(
+                    Component.translatable("keybindplus.editor.conflict_tooltip", conflictNames)
+                        .withStyle(ChatFormatting.RED)
+                ));
+            }
+
             // Unbind button
             boolean isAlreadyNone = isUnknownKey(data.keyName());
             this.unbindButton = Button.builder(
                 Component.translatable("keybindplus.editor.unbind"),
                 btn -> screen.unbindAction(data.actionId())
-            ).bounds(0, 0, 44, 20).build();
+            ).bounds(0, 0, 44, 20)
+            .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.editor_unbind")))
+            .build();
             this.unbindButton.active = !isAlreadyNone && !isListening;
 
             this.children = List.of(this.keyButton, this.unbindButton);

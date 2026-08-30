@@ -11,6 +11,8 @@ public class KeybindProfile {
     private Instant createdAt;
     private Instant updatedAt;
     private boolean isDefault;
+    private boolean isImported;
+    private transient boolean isLoaded;
     private Map<String, String> keybinds;
 
     public KeybindProfile() {
@@ -23,6 +25,8 @@ public class KeybindProfile {
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.isDefault = false;
+        this.isImported = false;
+        this.isLoaded = false;
         this.keybinds = new LinkedHashMap<>(keybinds);
     }
 
@@ -40,6 +44,12 @@ public class KeybindProfile {
 
     public boolean isDefault() { return isDefault; }
     public void setDefault(boolean isDefault) { this.isDefault = isDefault; }
+
+    public boolean isImported() { return isImported; }
+    public void setImported(boolean isImported) { this.isImported = isImported; }
+
+    public boolean isLoaded() { return isLoaded; }
+    public void setLoaded(boolean isLoaded) { this.isLoaded = isLoaded; }
 
     public Map<String, String> getKeybinds() {
         return Collections.unmodifiableMap(keybinds);
