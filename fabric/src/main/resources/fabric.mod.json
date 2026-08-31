@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "keybindplus",
   "version": "${version}",
-  "name": "KeybindPlus",
-  "description": "Keybind profile manager for PvP & modded Minecraft players. Save, load, compare, and share keybind profiles.",
+  "name": "KeybindPlus (Beta)",
+  "description": "[EXPERIMENTAL BETA] Keybind profile manager for Minecraft 1.20.x (Fabric & Forge). Save, load, compare, and edit keybind profiles.",
   "authors": ["KVdz00"],
   "contact": {
     "homepage": "https://github.com/KVdz00/keybindplus",
