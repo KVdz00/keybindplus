@@ -1,54 +1,51 @@
 plugins {
-    id "architectury-plugin" version "3.5-SNAPSHOT"
-    id "dev.architectury.loom" version "1.17-SNAPSHOT" apply false
+    id "gg.essential.loom" version "1.15.50"
+    id "com.gradleup.shadow" version "9.3.0"
 }
 
-architectury {
-    minecraft = rootProject.property("minecraft_version").toString()
+version = "1.2.0"
+group = "com.github.kvdz00.keybindplus"
+base {
+    archivesName = "keybindplus"
 }
 
-allprojects {
-    apply plugin: "java"
-    apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
+repositories {
+    mavenCentral()
+    maven { url = "https://repo.essential.gg/repository/maven-public/" }
+}
 
-    base {
-        archivesName = rootProject.property("archives_base_name").toString()
-    }
-
-    version = rootProject.property("mod_version").toString()
-    group = rootProject.property("maven_group").toString()
-
-    repositories {
-        maven { url = "https://maven.architectury.dev/" }
-        maven { url = "https://maven.fabricmc.net/" }
-        maven { url = "https://maven.minecraftforge.net/" }
-        maven { url = "https://maven.neoforged.net/releases/" }
-        mavenCentral()
-    }
-
-    tasks.withType(JavaCompile).configureEach {
-        options.encoding = "UTF-8"
-        options.release = 17
-    }
-
-    java {
-        withSourcesJar()
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
+loom {
+    forge {
+        pack200Provider = new dev.architectury.pack200.java.Pack200Adapter()
     }
 }
 
-subprojects {
-    apply plugin: "dev.architectury.loom"
+dependencies {
+    minecraft "com.mojang:minecraft:1.8.9"
+    mappings "de.oceanlabs.mcp:mcp_stable:22-1.8.9"
+    forge "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9"
+}
 
-    loom {
-        silentMojangMappingsLicense()
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 8
+}
 
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.property("minecraft_version")}"
-        mappings loom.officialMojangMappings()
+java {
+    withSourcesJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("mcmod.info") {
+        expand "version": project.version
+    }
+}
+
+remapJar {
+    archiveClassifier = "forge-1.8.9"
 }
