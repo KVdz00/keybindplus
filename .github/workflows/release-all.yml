@@ -16,25 +16,18 @@ jobs:
         include:
           - branch: main
             java: 25
-            artifact_pattern: "fabric/build/libs/*-fabric.jar\nneoforge/build/libs/*-neoforge.jar"
           - branch: 1.21.x
             java: 21
-            artifact_pattern: "fabric/build/libs/*-fabric.jar\nneoforge/build/libs/*-neoforge.jar"
           - branch: 1.20.x
-            java: 17
-            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+            java: 21
           - branch: 1.19.x
-            java: 17
-            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+            java: 21
           - branch: 1.18.x
-            java: 17
-            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+            java: 21
           - branch: 1.17.x
-            java: 17
-            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+            java: 21
           - branch: 1.8.9
-            java: 17
-            artifact_pattern: "build/libs/*-forge-1.8.9.jar"
+            java: 21
 
     steps:
       - name: Checkout ${{ matrix.branch }}
@@ -43,7 +36,7 @@ jobs:
           ref: ${{ matrix.branch }}
 
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -59,7 +52,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: keybindplus-${{ matrix.branch }}
-          path: ${{ matrix.artifact_pattern }}
+          path: |
+            fabric/build/libs/*.jar
+            neoforge/build/libs/*.jar
+            forge/build/libs/*.jar
+            build/libs/*.jar
+            !**/*-dev.jar
+            !**/*-dev-shadow.jar
+            !**/*-sources.jar
+          if-no-files-found: ignore
 
   publish-release:
     name: Publish Multi-Version Release
