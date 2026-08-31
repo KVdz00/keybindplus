@@ -78,7 +78,6 @@ public class KeybindPlusScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        // Top Row: Search field (168px), Sort button (68px), Folder button (64px) -> Total 308px
         this.searchField = new EditBox(this.font, centerX - 154, 26, 168, 18,
             new TranslatableComponent("keybindplus.screen.search"));
         this.searchField.setResponder(query -> refreshList());
@@ -102,12 +101,10 @@ public class KeybindPlusScreen extends Screen {
             (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.open_folder"), mx, my)
         ));
 
-        // Profile list
         this.profileList = new ProfileListWidget(this.minecraft, this,
             this.width, this.height, 48, this.height - 86, 28);
         this.addRenderableWidget(this.profileList);
 
-        // Row 1: Core Primary Actions (3 buttons, 100px each, gap 4px = 308px)
         int btnY1 = this.height - 76;
         this.loadButton = this.addRenderableWidget(new Button(
             centerX - 154, btnY1, 100, 20,
@@ -130,7 +127,6 @@ public class KeybindPlusScreen extends Screen {
             (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.undo"), mx, my)
         ));
 
-        // Row 2: Profile Management Actions (4 buttons, 74px each, gap 4px = 308px)
         int btnY2 = this.height - 52;
         this.saveButton = this.addRenderableWidget(new Button(
             centerX - 154, btnY2, 74, 20,
@@ -160,7 +156,6 @@ public class KeybindPlusScreen extends Screen {
             (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.delete"), mx, my)
         ));
 
-        // Row 3: Tools & Navigation (5 buttons, 58px each, gap 4px = 306px, centered)
         int btnY3 = this.height - 28;
         this.compareButton = this.addRenderableWidget(new Button(
             centerX - 153, btnY3, 58, 20,
