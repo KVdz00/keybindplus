@@ -10,17 +10,24 @@
 
 ---
 
+> [!IMPORTANT]
+> **Version Stability Status**:
+> - **Minecraft 26.2 (`main`)** is the primary stable production release.
+> - Backport branches (`1.21.x`, `1.20.x`, `1.19.x`, `1.18.x`, `1.17.x`, and `1.8.9`) are currently **experimental builds in active development**. They are published as automated test builds via GitHub Actions. See [VERSIONS.md](VERSIONS.md) for full branch details and download links.
+
+---
+
 ## Features
 
 - **Named Profiles**: Save, rename, duplicate, and switch complete keybind configurations on the fly.
 - **In-Game Editor**: Rebind or unbind keys (`NONE`) directly within profiles with real-time conflict highlights and hover tooltips.
-- **Visual Compare & 1-Click Sync**: Compare any two profiles side-by-side, filter differences, and copy keybindings across profiles with single-click `<` and `>` sync buttons.
-- **Flexible Sorting & Indexing**: Cycle through 6 organization modes (`A-Z`, `Z-A`, `Newest`, `Oldest`, `Imported Only`, `Local Only`).
-- **Clean Vanilla-First UI**: Minimalist aesthetic with green active profiles, cyan imported profiles, and subtle gold star (`★`) default indicators.
-- **Quick Load & Default**: Set or unset a default profile loaded automatically on startup or via a single hotkey.
-- **Safety First**: Instant one-click undo and automatic rolling backups before loading profiles.
-- **Seamless File I/O**: Native file dialog for importing and exporting `.json` profiles with schema validation.
-- **Zero Chat Clutter**: Silent operation with no chat spam; system toasts are restricted to async file dialogs.
+- **Visual Compare & 1-Click Sync**: Compare two profiles side-by-side, filter differences, and copy keybindings across profiles with `<` and `>` sync buttons.
+- **Sorting Modes**: Organize profiles by A-Z, Z-A, Newest, Oldest, Imported Only, or Local Only.
+- **Clean Vanilla-Style UI**: Visual indicators with green active profiles, cyan imported profiles, and gold star (`★`) default indicators.
+- **Quick Load Default**: Set or unset a default profile loaded on startup or via a single hotkey.
+- **Undo & Rolling Backups**: Revert to previous keybindings with one click or restore from automatic rolling backups.
+- **File Import & Export**: Import and export `.json` profiles directly via native file dialogs.
+- **Silent Operation**: Zero chat message spam; status toasts appear only during file dialog actions.
 
 ---
 
