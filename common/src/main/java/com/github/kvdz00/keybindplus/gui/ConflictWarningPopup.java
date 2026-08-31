@@ -30,14 +30,12 @@ public class ConflictWarningPopup extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        // Scrollable conflict list
         this.conflictList = new ConflictListWidget(this.minecraft, this.width, this.height - 84, 48, 20);
         for (KeyConflict conflict : conflicts) {
             this.conflictList.addConflict(conflict);
         }
         this.addRenderableWidget(this.conflictList);
 
-        // Action buttons fixed at the bottom: Apply Anyway, Resolve Conflicts, Cancel
         int btnY = this.height - 30;
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.conflict_apply"),
