@@ -243,8 +243,8 @@ public final class ProfileManager {
     public static boolean isValidProfileFile(Path file) {
         try {
             String content = Files.readString(file);
-            JsonObject obj = JsonParser.parseString(content).getAsJsonObject();
-            return obj.has("schemaVersion") && obj.has("keybinds") && obj.has("name");
+            KeybindProfile p = ProfileSerializer.deserialize(content);
+            return p != null && p.getName() != null && p.getKeybinds() != null;
         } catch (Exception e) {
             return false;
         }

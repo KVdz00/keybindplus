@@ -15,7 +15,7 @@ public final class ToastNotification {
 
         ToastComponent tc = mc.getToasts();
         if (tc != null) {
-            SystemToast.addOrUpdate(tc, SystemToast.SystemToastIds.PERIODIC_NOTIFICATION, title, description);
+            SystemToast.addOrUpdate(tc, SystemToast.SystemToastIds.TUTORIAL_HINT, title, description);
         }
     }
 
