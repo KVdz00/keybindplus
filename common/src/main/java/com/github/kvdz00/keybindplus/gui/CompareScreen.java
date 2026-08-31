@@ -191,13 +191,6 @@ public class CompareScreen extends Screen {
         return key.toLowerCase();
     }
 
-    private static String isUnknownKey(String keyName) {
-        return keyName == null || keyName.isBlank()
-            || keyName.equals("key.keyboard.unknown")
-            || keyName.equalsIgnoreCase("none")
-            || keyName.equals(InputConstants.UNKNOWN.getName()) ? "none" : null;
-    }
-
     private static boolean checkUnknownKey(String keyName) {
         return keyName == null || keyName.isBlank()
             || keyName.equals("key.keyboard.unknown")
