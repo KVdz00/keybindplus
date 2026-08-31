@@ -4,6 +4,7 @@ import com.github.kvdz00.keybindplus.keybind.KeyConflict;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.util.List;
@@ -84,7 +85,7 @@ public class ConflictWarningPopup extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == 1) { // ESC
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             this.mc.displayGuiScreen(parent);
         }
     }

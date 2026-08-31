@@ -121,14 +121,14 @@ public class KeybindEditorScreen extends GuiScreen {
         if (button.id == 100) {
             conflictsOnly = !conflictsOnly;
             refreshList();
-        } else if (button.id == 1) { // Save & Apply
+        } else if (button.id == 1) {
             profile.setKeybinds(workingBinds);
             ProfileManager.get().saveProfile(profile);
             ProfileManager.get().createBackup();
             ApplyResult res = KeybindApplier.apply(profile);
             ToastNotification.toast("keybindplus.toast.saved_title", "keybindplus.toast.saved_desc", profile.getName());
             this.mc.displayGuiScreen(parent);
-        } else if (button.id == 2) { // Cancel
+        } else if (button.id == 2) {
             this.mc.displayGuiScreen(parent);
         }
     }
@@ -136,7 +136,7 @@ public class KeybindEditorScreen extends GuiScreen {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         if (listeningEntry != null) {
-            if (keyCode == 1) { // ESC -> Unbind / Cancel listening
+            if (keyCode == Keyboard.KEY_ESCAPE) {
                 listeningEntry.setKey("NONE");
             } else {
                 String keyStr = KeybindCapture.getKeySaveString(keyCode);
@@ -146,7 +146,7 @@ public class KeybindEditorScreen extends GuiScreen {
             return;
         }
 
-        if (keyCode == 1) { // ESC
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             this.mc.displayGuiScreen(parent);
             return;
         }

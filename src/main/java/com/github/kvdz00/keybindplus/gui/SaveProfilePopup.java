@@ -77,13 +77,13 @@ public class SaveProfilePopup extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == 1) { // ESC
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             if (onCancel != null) onCancel.run();
             this.mc.displayGuiScreen(parent);
             return;
         }
 
-        if (keyCode == 28) { // ENTER
+        if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
             String text = nameField.getText().trim();
             if (!text.isEmpty()) {
                 if (onSave != null) onSave.accept(text);

@@ -83,13 +83,11 @@ public class ProfileListWidget extends GuiSlot {
         int textColor = p.isLoaded() ? 0x55FF55 : 0xFFFFFF;
         font.drawString(p.getName(), insideLeft + 4, yPos + 3, textColor);
 
-        // Meta info line: key count and updated time
         String keyCount = I18n.format("keybindplus.profile.keys", p.getKeybinds().size());
         String timeAgo = I18n.format("keybindplus.profile.updated", formatTimeAgo(p.getUpdatedAt()));
         String meta = keyCount + "  •  " + timeAgo;
         font.drawString(meta, insideLeft + 4, yPos + 15, 0x888888);
 
-        // Badges on the right side of the slot
         int badgeX = insideLeft + getListWidth() - 55;
         if (p.isDefault()) {
             Gui.drawRect(badgeX - 2, yPos + 4, badgeX + 48, yPos + 14, 0x90FF8800);

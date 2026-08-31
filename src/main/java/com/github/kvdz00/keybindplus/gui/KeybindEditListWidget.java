@@ -89,7 +89,6 @@ public class KeybindEditListWidget extends GuiSlot {
         String actionDisplay = I18n.format(entry.getActionId());
         font.drawString(actionDisplay, insideLeft + 4, yPos + 6, nameColor);
 
-        // Key button
         int btnKeyX = insideLeft + getListWidth() - 120;
         int btnKeyY = yPos + 2;
         int btnKeyW = 80;
@@ -103,7 +102,6 @@ public class KeybindEditListWidget extends GuiSlot {
         int textX = btnKeyX + (btnKeyW - font.getStringWidth(keyText)) / 2;
         font.drawString(keyText, textX, btnKeyY + 4, keyTextColor);
 
-        // Unbind button
         int btnUnbindX = insideLeft + getListWidth() - 35;
         int btnUnbindY = yPos + 2;
         int btnUnbindW = 30;

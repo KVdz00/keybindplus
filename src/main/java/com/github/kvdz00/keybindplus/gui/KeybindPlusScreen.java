@@ -30,7 +30,6 @@ public class KeybindPlusScreen extends GuiScreen {
     private GuiTextField searchField;
     private SortMode currentSort = SortMode.AZ;
 
-    // Buttons
     private GuiButton loadBtn;
     private GuiButton saveBtn;
     private GuiButton editBtn;
@@ -196,34 +195,34 @@ public class KeybindPlusScreen extends GuiScreen {
         KeybindProfile selected = listWidget.getSelectedProfile();
 
         switch (button.id) {
-            case 100: // Sort
+            case 100:
                 currentSort = currentSort.next();
                 sortBtn.displayString = I18n.format("keybindplus.tooltip.sort", currentSort.getDisplayName());
                 refreshList();
                 break;
-            case 1: // Load
+            case 1:
                 if (selected != null) applyProfile(selected);
                 break;
-            case 2: // Save
+            case 2:
                 this.mc.displayGuiScreen(new SaveProfilePopup(this, I18n.format("keybindplus.popup.save_title"), "", name -> {
                     ProfileManager.get().createProfileFromCurrent(name);
                     ToastNotification.toast("keybindplus.toast.saved_title", "keybindplus.toast.saved_desc", name);
                     refreshList();
                 }, null));
                 break;
-            case 3: // Edit
+            case 3:
                 if (selected != null) {
                     this.mc.displayGuiScreen(new KeybindEditorScreen(this, selected));
                 }
                 break;
-            case 4: // Compare
+            case 4:
                 if (selected != null) {
                     this.mc.displayGuiScreen(new CompareSelectPopup(this, selected, target -> {
                         this.mc.displayGuiScreen(new CompareScreen(this, selected, target));
                     }));
                 }
                 break;
-            case 5: // Delete
+            case 5:
                 if (selected != null) {
                     String msg = I18n.format("keybindplus.popup.confirm_delete", selected.getName());
                     this.mc.displayGuiScreen(new ConfirmPopup(this, msg, () -> {
@@ -233,7 +232,7 @@ public class KeybindPlusScreen extends GuiScreen {
                     }, null));
                 }
                 break;
-            case 6: // Rename
+            case 6:
                 if (selected != null) {
                     this.mc.displayGuiScreen(new SaveProfilePopup(this, I18n.format("keybindplus.popup.rename_title"), selected.getName(), newName -> {
                         ProfileManager.get().renameProfile(selected.getName(), newName);
@@ -242,7 +241,7 @@ public class KeybindPlusScreen extends GuiScreen {
                     }, null));
                 }
                 break;
-            case 7: // Duplicate
+            case 7:
                 if (selected != null) {
                     this.mc.displayGuiScreen(new SaveProfilePopup(this, I18n.format("keybindplus.popup.duplicate_title"), selected.getName() + "_copy", newName -> {
                         ProfileManager.get().duplicateProfile(selected.getName(), newName);
@@ -251,7 +250,7 @@ public class KeybindPlusScreen extends GuiScreen {
                     }, null));
                 }
                 break;
-            case 8: // Set/Unset Default
+            case 8:
                 if (selected != null) {
                     if (selected.isDefault()) {
                         ProfileManager.get().clearDefaultProfile();
@@ -263,7 +262,7 @@ public class KeybindPlusScreen extends GuiScreen {
                     refreshList();
                 }
                 break;
-            case 9: // Export
+            case 9:
                 if (selected != null) {
                     Path p = ProfileManager.get().exportProfile(selected.getName());
                     if (p != null) {
@@ -271,13 +270,13 @@ public class KeybindPlusScreen extends GuiScreen {
                     }
                 }
                 break;
-            case 10: // Import
+            case 10:
                 openImportChooser();
                 break;
-            case 11: // Folder
+            case 11:
                 openConfigFolder();
                 break;
-            case 12: // Undo
+            case 12:
                 ApplyResult res = KeybindApplier.undoLastApply();
                 if (res.getAppliedCount() > 0) {
                     ToastNotification.toast("keybindplus.toast.undo_title", "keybindplus.toast.undo_desc");
@@ -286,7 +285,7 @@ public class KeybindPlusScreen extends GuiScreen {
                 }
                 refreshList();
                 break;
-            case 13: // Done
+            case 13:
                 this.mc.displayGuiScreen(parent);
                 break;
         }
@@ -333,7 +332,6 @@ public class KeybindPlusScreen extends GuiScreen {
                     }
                 }
             } catch (Exception e) {
-                // Fallback: list imports directory files
                 mc.addScheduledTask(() -> {
                     List<Path> imports = ProfileManager.get().listImportFiles();
                     if (!imports.isEmpty()) {
@@ -379,7 +377,7 @@ public class KeybindPlusScreen extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == 1) { // ESC
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             this.mc.displayGuiScreen(parent);
             return;
         }

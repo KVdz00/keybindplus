@@ -120,14 +120,14 @@ public class CompareScreen extends GuiScreen {
         if (button.id == 100) {
             diffsOnly = !diffsOnly;
             refreshList();
-        } else if (button.id == 1) { // Done
+        } else if (button.id == 1) {
             this.mc.displayGuiScreen(parent);
         }
     }
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == 1) { // ESC
+        if (keyCode == Keyboard.KEY_ESCAPE) {
             this.mc.displayGuiScreen(parent);
             return;
         }
@@ -276,23 +276,19 @@ public class CompareScreen extends GuiScreen {
 
             int rightBase = insideLeft + getListWidth();
 
-            // Key A
             int keyAX = rightBase - 260;
             Gui.drawRect(keyAX, yPos + 2, keyAX + 70, yPos + 18, entry.isDiff ? 0xFF443322 : 0xFF333333);
             String dispA = entry.getDisplayKeyA();
             font.drawString(dispA, keyAX + (70 - font.getStringWidth(dispA)) / 2, yPos + 5, 0xFFFFFF);
 
-            // Copy to A button "<- A"
             int copyAX = rightBase - 180;
             Gui.drawRect(copyAX, yPos + 2, copyAX + 35, yPos + 18, 0xFF444444);
             font.drawString("<- A", copyAX + (35 - font.getStringWidth("<- A")) / 2, yPos + 5, 0xCCCCCC);
 
-            // Copy to B button "B ->"
             int copyBX = rightBase - 140;
             Gui.drawRect(copyBX, yPos + 2, copyBX + 35, yPos + 18, 0xFF444444);
             font.drawString("B ->", copyBX + (35 - font.getStringWidth("B ->")) / 2, yPos + 5, 0xCCCCCC);
 
-            // Key B
             int keyBX = rightBase - 95;
             Gui.drawRect(keyBX, yPos + 2, keyBX + 70, yPos + 18, entry.isDiff ? 0xFF223344 : 0xFF333333);
             String dispB = entry.getDisplayKeyB();
