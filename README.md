@@ -1,12 +1,20 @@
 <div align="center">
   <img src="common/src/main/resources/assets/keybindplus/icon.png" width="128" height="128" alt="KeybindPlus Icon" />
-  <h1>KeybindPlus</h1>
+  <h1>KeybindPlus (1.21.x)</h1>
   <p><strong>Client-side keybind profile manager, in-game editor, and conflict resolver for Minecraft.</strong></p>
 
-  [![Build Status](https://github.com/KVdz00/keybindplus/actions/workflows/build.yml/badge.svg)](https://github.com/KVdz00/keybindplus/actions)
+  [![Build Status](https://github.com/KVdz00/keybindplus/actions/workflows/build.yml/badge.svg?branch=1.21.x)](https://github.com/KVdz00/keybindplus/actions)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-  [![Minecraft Version](https://img.shields.io/badge/Minecraft-26.2+-brightgreen.svg)](VERSIONS.md)
+  [![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21--1.21.11-orange.svg)](VERSIONS.md)
 </div>
+
+---
+
+> [!WARNING]
+> **Branch Status: Experimental Backport (Beta)**
+> - This branch (`1.21.x`) is an experimental port for **Minecraft 1.21 - 1.21.11** (Fabric & NeoForge).
+> - It is in active development and subject to testing. For the stable release, visit the [`main`](https://github.com/KVdz00/keybindplus) branch (Minecraft 26.2+).
+> - Compiled `.jar` files can be downloaded from the **Actions** tab build artifacts.
 
 ---
 
@@ -14,13 +22,13 @@
 
 - **Named Profiles**: Save, rename, duplicate, and switch complete keybind configurations on the fly.
 - **In-Game Editor**: Rebind or unbind keys (`NONE`) directly within profiles with real-time conflict highlights and hover tooltips.
-- **Visual Compare & 1-Click Sync**: Compare any two profiles side-by-side, filter differences, and copy keybindings across profiles with single-click `<` and `>` sync buttons.
-- **Flexible Sorting & Indexing**: Cycle through 6 organization modes (`A-Z`, `Z-A`, `Newest`, `Oldest`, `Imported Only`, `Local Only`).
-- **Clean Vanilla-First UI**: Minimalist aesthetic with green active profiles, cyan imported profiles, and subtle gold star (`★`) default indicators.
-- **Quick Load & Default**: Set or unset a default profile loaded automatically on startup or via a single hotkey.
-- **Safety First**: Instant one-click undo and automatic rolling backups before loading profiles.
-- **Seamless File I/O**: Native file dialog for importing and exporting `.json` profiles with schema validation.
-- **Zero Chat Clutter**: Silent operation with no chat spam; system toasts are restricted to async file dialogs.
+- **Visual Compare & 1-Click Sync**: Compare two profiles side-by-side, filter differences, and copy keybindings across profiles with `<` and `>` sync buttons.
+- **Sorting Modes**: Organize profiles by A-Z, Z-A, Newest, Oldest, Imported Only, or Local Only.
+- **Clean Vanilla-Style UI**: Visual indicators with green active profiles, cyan imported profiles, and gold star (`★`) default indicators.
+- **Quick Load Default**: Set or unset a default profile loaded on startup or via a single hotkey.
+- **Undo & Rolling Backups**: Revert to previous keybindings with one click or restore from automatic rolling backups.
+- **File Import & Export**: Import and export `.json` profiles directly via native file dialogs.
+- **Silent Operation**: Zero chat message spam; status toasts appear only during file dialog actions.
 
 ---
 
@@ -52,10 +60,11 @@
 
 ## Installation & Requirements
 
-- **Supported Loaders**: Fabric Loader (`>=0.19.0`) & NeoForge (`>=26.2`)
-- **Required Dependencies**: Architectury API, Fabric API (Fabric only)
-- **Java Runtime**: Java 25+
-- **Minecraft Version**: 26.2+ *(See [VERSIONS.md](VERSIONS.md) for 1.17–1.21 and 1.8.9 legacy roadmap)*
+- **Minecraft Version**: 1.21 – 1.21.11 (Experimental Beta)
+- **Supported Loaders**: Fabric Loader (`>=0.16.0`) & NeoForge (`>=21.4.113-beta`)
+- **Required Dependencies**: Architectury API (`>=13.0.8`), Fabric API (Fabric only)
+- **Java Runtime**: Java 21+
+- **Stable Branch**: [`main`](https://github.com/KVdz00/keybindplus) (Minecraft 26.2+)
 
 Place the compiled `.jar` file into your `.minecraft/mods/` directory and launch the game.
 
