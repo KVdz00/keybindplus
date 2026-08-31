@@ -7,8 +7,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
@@ -44,7 +43,7 @@ public class CompareScreen extends Screen {
         var options = Minecraft.getInstance().options;
         if (options != null && options.keyMappings != null) {
             for (KeyMapping km : options.keyMappings) {
-                this.actionCategories.put(km.getName(), km.getCategory().id().getPath());
+                this.actionCategories.put(km.getName(), km.getCategory());
             }
         }
 
@@ -94,7 +93,7 @@ public class CompareScreen extends Screen {
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.screen.done"),
-            btn -> this.minecraft.setScreenAndShow(parent)
+            btn -> this.minecraft.setScreen(parent)
         ).bounds(centerX - 50, this.height - 28, 100, 20).build());
 
         refreshList();
@@ -152,9 +151,9 @@ public class CompareScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, 8, this.title);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 8, 0xFFFFFF);
 
         int centerX = this.width / 2;
         int headerY = 46;
@@ -168,12 +167,15 @@ public class CompareScreen extends Screen {
         ChatFormatting colorA = profileA.isLoaded() ? ChatFormatting.GREEN : (profileA.isImported() ? ChatFormatting.AQUA : ChatFormatting.WHITE);
         ChatFormatting colorB = profileB.isLoaded() ? ChatFormatting.GREEN : (profileB.isImported() ? ChatFormatting.AQUA : (profileB.isDefault() ? ChatFormatting.GOLD : ChatFormatting.WHITE));
 
-        graphics.textRenderer().accept(colActionX, headerY,
-            Component.translatable("keybindplus.compare.action").withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD));
-        graphics.textRenderer().accept(colA_X, headerY,
-            Component.literal(truncate(profileA.getName(), 12)).withStyle(colorA, ChatFormatting.BOLD));
-        graphics.textRenderer().accept(colB_X, headerY,
-            Component.literal(truncate(profileB.getName(), 12)).withStyle(colorB, ChatFormatting.BOLD));
+        graphics.drawString(this.font,
+            Component.translatable("keybindplus.compare.action").withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD),
+            colActionX, headerY, 0xAAAAAA, false);
+        graphics.drawString(this.font,
+            Component.literal(truncate(profileA.getName(), 12)).withStyle(colorA, ChatFormatting.BOLD),
+            colA_X, headerY, 0xFFFFFF, false);
+        graphics.drawString(this.font,
+            Component.literal(truncate(profileB.getName(), 12)).withStyle(colorB, ChatFormatting.BOLD),
+            colB_X, headerY, 0xFFFFFF, false);
 
         graphics.fill(startX, headerY + 10, startX + rowWidth, headerY + 11, 0xFF444444);
     }
@@ -189,13 +191,6 @@ public class CompareScreen extends Screen {
             return "none";
         }
         return key.toLowerCase();
-    }
-
-    private static String isUnknownKey(String keyName) {
-        return keyName == null || keyName.isBlank()
-            || keyName.equals("key.keyboard.unknown")
-            || keyName.equalsIgnoreCase("none")
-            || keyName.equals(InputConstants.UNKNOWN.getName()) ? "none" : null;
     }
 
     private static boolean checkUnknownKey(String keyName) {
@@ -274,10 +269,10 @@ public class CompareScreen extends Screen {
             }
 
             @Override
-            public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
-                                       boolean hovered, float delta) {
-                int baseX = this.getX();
-                int rowY = this.getY();
+            public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+                               int mouseX, int mouseY, boolean hovering, float partialTick) {
+                int baseX = left;
+                int rowY = top;
                 int rowWidth = CompareListWidget.this.getRowWidth();
 
                 int colActionX = baseX + 6;
@@ -293,14 +288,14 @@ public class CompareScreen extends Screen {
                     if (syncToAButton != null) {
                         syncToAButton.setX(syncA_X);
                         syncToAButton.setY(rowY + 6);
-                        syncToAButton.extractRenderState(graphics, mouseX, mouseY, delta);
+                        syncToAButton.render(graphics, mouseX, mouseY, partialTick);
                     }
                     if (syncToBButton != null) {
                         syncToBButton.setX(syncB_X);
                         syncToBButton.setY(rowY + 6);
-                        syncToBButton.extractRenderState(graphics, mouseX, mouseY, delta);
+                        syncToBButton.render(graphics, mouseX, mouseY, partialTick);
                     }
-                } else if (hovered) {
+                } else if (hovering) {
                     graphics.fill(baseX, rowY + 1, baseX + rowWidth, rowY + 27, 0x12FFFFFF);
                 }
 
@@ -310,12 +305,12 @@ public class CompareScreen extends Screen {
                 } else {
                     actionText = actionText.withStyle(ChatFormatting.WHITE);
                 }
-                graphics.textRenderer().accept(colActionX, rowY + 4, actionText);
+                graphics.drawString(Minecraft.getInstance().font, actionText, colActionX, rowY + 4, 0xFFFFFF, false);
 
                 String category = actionCategories.getOrDefault(data.actionId(), "");
                 if (!category.isEmpty()) {
-                    graphics.textRenderer().accept(colActionX, rowY + 15,
-                        Component.literal(category).withStyle(ChatFormatting.DARK_GRAY));
+                    graphics.drawString(Minecraft.getInstance().font,
+                        Component.literal(category).withStyle(ChatFormatting.DARK_GRAY), colActionX, rowY + 15, 0x888888, false);
                 }
 
                 String keyA = formatKeyName(data.valueA());
@@ -325,7 +320,7 @@ public class CompareScreen extends Screen {
                 } else {
                     textA = textA.withStyle(checkUnknownKey(data.valueA()) ? ChatFormatting.DARK_GRAY : ChatFormatting.GRAY);
                 }
-                graphics.textRenderer().accept(colA_X, rowY + 8, textA);
+                graphics.drawString(Minecraft.getInstance().font, textA, colA_X, rowY + 8, 0xFFFFFF, false);
 
                 String keyB = formatKeyName(data.valueB());
                 MutableComponent textB = Component.literal(keyB);
@@ -334,7 +329,7 @@ public class CompareScreen extends Screen {
                 } else {
                     textB = textB.withStyle(checkUnknownKey(data.valueB()) ? ChatFormatting.DARK_GRAY : ChatFormatting.GRAY);
                 }
-                graphics.textRenderer().accept(colB_X, rowY + 8, textB);
+                graphics.drawString(Minecraft.getInstance().font, textB, colB_X, rowY + 8, 0xFFFFFF, false);
             }
 
             @Override

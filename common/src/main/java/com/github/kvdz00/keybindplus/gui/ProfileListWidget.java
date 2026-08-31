@@ -2,10 +2,10 @@ package com.github.kvdz00.keybindplus.gui;
 
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -72,14 +72,15 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
 
     public class Entry extends ObjectSelectionList.Entry<Entry> {
         final KeybindProfile profile;
+        private long lastClickTime = 0L;
 
         Entry(KeybindProfile profile) {
             this.profile = profile;
         }
 
         @Override
-        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
-                                   boolean hovered, float delta) {
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+                           int mouseX, int mouseY, boolean hovering, float partialTick) {
             ChatFormatting nameColor;
             if (profile.isLoaded()) {
                 nameColor = ChatFormatting.GREEN;
@@ -101,16 +102,20 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
                 meta += " | " + timeAgo + " ago";
             }
 
-            graphics.textRenderer().accept(this.getX() + 6, this.getY() + 3, title);
-            graphics.textRenderer().accept(this.getX() + 6, this.getY() + 14,
-                Component.literal(meta).withStyle(ChatFormatting.DARK_GRAY));
+            graphics.drawString(ProfileListWidget.this.minecraft.font, title, left + 6, top + 3, 0xFFFFFF, false);
+            graphics.drawString(ProfileListWidget.this.minecraft.font, Component.literal(meta).withStyle(ChatFormatting.DARK_GRAY),
+                left + 6, top + 14, 0x888888, false);
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             ProfileListWidget.this.setSelected(this);
-            if (doubleClick) {
-                ProfileListWidget.this.parentScreen.onLoad();
+            if (button == 0) {
+                long now = Util.getMillis();
+                if (now - this.lastClickTime < 250L) {
+                    ProfileListWidget.this.parentScreen.onLoad();
+                }
+                this.lastClickTime = now;
             }
             return true;
         }

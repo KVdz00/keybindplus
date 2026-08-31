@@ -12,8 +12,8 @@ public final class ToastNotification {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null) return;
 
-        if (mc.gui != null && mc.gui.toastManager() != null) {
-            ToastManager tm = mc.gui.toastManager();
+        ToastManager tm = mc.getToastManager();
+        if (tm != null) {
             SystemToast.addOrUpdate(tm, SystemToast.SystemToastId.PERIODIC_NOTIFICATION, title, description);
         }
     }

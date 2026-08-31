@@ -3,7 +3,7 @@ package com.github.kvdz00.keybindplus.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Tooltip;
@@ -93,23 +93,23 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         }
 
         @Override
-        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
-                                   boolean hovered, float delta) {
-            int rowX = this.getX() + 4;
-            int rowY = this.getY();
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+                           int mouseX, int mouseY, boolean hovering, float partialTick) {
+            int rowX = left + 4;
+            int rowY = top;
             int rowWidth = KeybindEditListWidget.this.getRowWidth();
 
             // Position buttons on the right side
-            int unbindX = this.getX() + rowWidth - 46;
+            int unbindX = left + rowWidth - 46;
             int keyX = unbindX - 88;
 
             this.keyButton.setX(keyX);
             this.keyButton.setY(rowY + 4);
-            this.keyButton.extractRenderState(graphics, mouseX, mouseY, delta);
+            this.keyButton.render(graphics, mouseX, mouseY, partialTick);
 
             this.unbindButton.setX(unbindX);
             this.unbindButton.setY(rowY + 4);
-            this.unbindButton.extractRenderState(graphics, mouseX, mouseY, delta);
+            this.unbindButton.render(graphics, mouseX, mouseY, partialTick);
 
             // Action name (left side)
             MutableComponent actionText = Component.translatable(data.actionId());
@@ -117,13 +117,13 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
                 actionText = actionText.withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
             }
 
-            graphics.textRenderer().accept(rowX, rowY + 4, actionText);
+            graphics.drawString(Minecraft.getInstance().font, actionText, rowX, rowY + 4, 0xFFFFFF, false);
 
             // Category tag (small below action name)
             String cat = data.category();
             if (cat != null && !cat.isBlank()) {
-                graphics.textRenderer().accept(rowX, rowY + 15,
-                    Component.literal(cat).withStyle(ChatFormatting.DARK_GRAY));
+                graphics.drawString(Minecraft.getInstance().font,
+                    Component.literal(cat).withStyle(ChatFormatting.DARK_GRAY), rowX, rowY + 15, 0x888888, false);
             }
         }
 

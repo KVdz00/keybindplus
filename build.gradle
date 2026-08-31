@@ -7,19 +7,6 @@ architectury {
     minecraft = rootProject.property("minecraft_version").toString()
 }
 
-subprojects {
-    apply plugin: "dev.architectury.loom"
-
-    loom {
-        silentMojangMappingsLicense()
-    }
-
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.property("minecraft_version")}"
-        mappings files("${rootProject.projectDir}/mappings/mappings.jar")
-    }
-}
-
 allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
@@ -41,13 +28,26 @@ allprojects {
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = "UTF-8"
-        options.release = 25
+        options.release = 21
     }
 
     java {
         withSourcesJar()
         toolchain {
-            languageVersion = JavaLanguageVersion.of(25)
+            languageVersion = JavaLanguageVersion.of(21)
         }
+    }
+}
+
+subprojects {
+    apply plugin: "dev.architectury.loom"
+
+    loom {
+        silentMojangMappingsLicense()
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.property("minecraft_version")}"
+        mappings loom.officialMojangMappings()
     }
 }

@@ -1,12 +1,11 @@
 package com.github.kvdz00.keybindplus.gui;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
 
@@ -49,7 +48,7 @@ public class SaveProfilePopup extends Screen {
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
-            btn -> this.minecraft.setScreenAndShow(parent)
+            btn -> this.minecraft.setScreen(parent)
         ).bounds(centerX + 5, centerY + 20, 100, 20).build());
     }
 
@@ -57,22 +56,22 @@ public class SaveProfilePopup extends Screen {
         String name = this.nameField.getValue().trim();
         if (!name.isEmpty()) {
             onSave.accept(name);
-            this.minecraft.setScreenAndShow(parent);
+            this.minecraft.setScreen(parent);
         }
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, this.height / 2 - 35, this.title);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 35, 0xFFFFFF);
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.key() == 257) { // Enter key
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
             doSave();
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

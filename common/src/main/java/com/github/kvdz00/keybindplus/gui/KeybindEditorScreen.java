@@ -5,14 +5,11 @@ import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import com.github.kvdz00.keybindplus.profile.ProfileManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
@@ -47,7 +44,7 @@ public class KeybindEditorScreen extends Screen {
         var options = net.minecraft.client.Minecraft.getInstance().options;
         if (options != null && options.keyMappings != null) {
             for (KeyMapping km : options.keyMappings) {
-                this.actionCategories.put(km.getName(), km.getCategory().id().getPath());
+                this.actionCategories.put(km.getName(), km.getCategory());
             }
         }
     }
@@ -97,7 +94,7 @@ public class KeybindEditorScreen extends Screen {
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
-            btn -> this.minecraft.setScreenAndShow(parent)
+            btn -> this.minecraft.setScreen(parent)
         ).bounds(centerX + 50, btnY, 104, 20).build());
 
         refreshList();
@@ -185,43 +182,43 @@ public class KeybindEditorScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.activeRebindAction != null) {
-            if (event.key() == GLFW.GLFW_KEY_ESCAPE) {
+            if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
                 this.workingKeybinds.put(activeRebindAction, "key.keyboard.unknown");
             } else {
-                InputConstants.Key key = InputConstants.getKey(event);
+                InputConstants.Key key = InputConstants.getKey(keyCode, scanCode);
                 this.workingKeybinds.put(activeRebindAction, key.getName());
             }
             this.activeRebindAction = null;
             refreshList();
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.activeRebindAction != null) {
-            InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(event.button());
+            InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(button);
             this.workingKeybinds.put(activeRebindAction, mouseKey.getName());
             this.activeRebindAction = null;
             refreshList();
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     private void onSaveAndApply() {
         saveChanges();
         ProfileManager.get().createAutoBackup();
         KeybindApplier.apply(profile);
-        this.minecraft.setScreenAndShow(parent);
+        this.minecraft.setScreen(parent);
     }
 
     private void onSaveOnly() {
         saveChanges();
-        this.minecraft.setScreenAndShow(parent);
+        this.minecraft.setScreen(parent);
     }
 
     private void saveChanges() {
@@ -237,9 +234,9 @@ public class KeybindEditorScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, 10, this.title);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 10, 0xFFFFFF);
     }
 
     @Override

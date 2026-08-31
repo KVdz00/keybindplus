@@ -3,8 +3,7 @@ package com.github.kvdz00.keybindplus.gui;
 import com.github.kvdz00.keybindplus.keybind.KeyConflict;
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
@@ -42,28 +41,27 @@ public class ConflictWarningPopup extends Screen {
         int btnY = this.height - 30;
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.conflict_apply"),
-            btn -> { onApply.run(); this.minecraft.setScreenAndShow(parent); }
+            btn -> { onApply.run(); this.minecraft.setScreen(parent); }
         ).bounds(centerX - 154, btnY, 96, 20).build());
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.conflict_resolve"),
-            btn -> this.minecraft.setScreenAndShow(new KeybindEditorScreen(parent, profile, true))
+            btn -> this.minecraft.setScreen(new KeybindEditorScreen(parent, profile, true))
         ).bounds(centerX - 54, btnY, 114, 20).build());
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
-            btn -> this.minecraft.setScreenAndShow(parent)
+            btn -> this.minecraft.setScreen(parent)
         ).bounds(centerX + 64, btnY, 90, 20).build());
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
         int centerX = this.width / 2;
 
-        graphics.textRenderer().accept(TextAlignment.CENTER, centerX, 12, this.title);
-        graphics.textRenderer().accept(TextAlignment.CENTER, centerX, 28,
-            Component.translatable("keybindplus.popup.conflict_subtitle"));
+        graphics.drawCenteredString(this.font, this.title, centerX, 12, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, Component.translatable("keybindplus.popup.conflict_subtitle"), centerX, 28, 0xAAAAAA);
     }
 
     public static class ConflictListWidget extends ObjectSelectionList<ConflictListWidget.ConflictEntry> {
@@ -88,14 +86,14 @@ public class ConflictWarningPopup extends Screen {
             }
 
             @Override
-            public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
-                                       boolean hovered, float delta) {
+            public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+                               int mouseX, int mouseY, boolean hovering, float partialTick) {
                 String keyDisplay = "[" + formatKey(conflict.key()) + "]";
                 String actionsDisplay = String.join(", ", conflict.actions().stream()
                     .map(this::formatAction).toList());
 
-                graphics.textRenderer().accept(this.getX() + 6, this.getY() + 4,
-                    Component.literal(keyDisplay + "  ->  " + actionsDisplay));
+                graphics.drawString(Minecraft.getInstance().font,
+                    Component.literal(keyDisplay + "  ->  " + actionsDisplay), left + 6, top + 4, 0xFFFFFF, false);
             }
 
             @Override

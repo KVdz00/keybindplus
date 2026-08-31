@@ -15,20 +15,20 @@ logoFile = "icon.png"
 [[dependencies.keybindplus]]
 modId = "neoforge"
 type = "required"
-versionRange = "[26.2,)"
+versionRange = "[21.4,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.keybindplus]]
 modId = "minecraft"
 type = "required"
-versionRange = "[26.2,)"
+versionRange = "[1.21.4,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.keybindplus]]
 modId = "architectury"
 type = "required"
-versionRange = "[21,)"
+versionRange = "[13,)"
 ordering = "NONE"
 side = "BOTH"

@@ -2,13 +2,12 @@ package com.github.kvdz00.keybindplus.gui;
 
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -58,7 +57,7 @@ public class CompareSelectPopup extends Screen {
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
-            btn -> this.minecraft.setScreenAndShow(parent)
+            btn -> this.minecraft.setScreen(parent)
         ).bounds(centerX + 5, btnY, 100, 20).build());
 
         if (!candidateProfiles.isEmpty()) {
@@ -74,16 +73,16 @@ public class CompareSelectPopup extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, 12, this.title);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
 
         ChatFormatting sourceColor = sourceProfile.isLoaded() ? ChatFormatting.GREEN : (sourceProfile.isImported() ? ChatFormatting.AQUA : ChatFormatting.WHITE);
         MutableComponent sub = Component.translatable(
             "keybindplus.popup.compare_subtitle",
             Component.literal(sourceProfile.getName()).withStyle(sourceColor, ChatFormatting.BOLD)
         );
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, 28, sub);
+        graphics.drawCenteredString(this.font, sub, this.width / 2, 28, 0xFFFFFF);
     }
 
     @Override
@@ -118,17 +117,15 @@ public class CompareSelectPopup extends Screen {
 
         private class TargetEntry extends ObjectSelectionList.Entry<TargetEntry> {
             final KeybindProfile profile;
+            private long lastClickTime = 0L;
 
             TargetEntry(KeybindProfile profile) {
                 this.profile = profile;
             }
 
             @Override
-            public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY,
-                                       boolean hovered, float delta) {
-                int rowX = this.getX() + 4;
-                int rowY = this.getY();
-
+            public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+                               int mouseX, int mouseY, boolean hovering, float partialTick) {
                 ChatFormatting nameColor;
                 if (profile.isLoaded()) {
                     nameColor = ChatFormatting.GREEN;
@@ -143,14 +140,18 @@ public class CompareSelectPopup extends Screen {
                     text.append(Component.literal(" \u2605").withStyle(ChatFormatting.GOLD));
                 }
 
-                graphics.textRenderer().accept(rowX + 6, rowY + 6, text);
+                graphics.drawString(CompareSelectPopup.this.minecraft.font, text, left + 6, top + 6, 0xFFFFFF, false);
             }
 
             @Override
-            public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
                 TargetListWidget.this.setSelected(this);
-                if (doubleClick) {
-                    onTargetSelected.accept(this.profile);
+                if (button == 0) {
+                    long now = Util.getMillis();
+                    if (now - this.lastClickTime < 250L) {
+                        onTargetSelected.accept(this.profile);
+                    }
+                    this.lastClickTime = now;
                 }
                 return true;
             }

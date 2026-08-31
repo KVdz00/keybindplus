@@ -1,9 +1,8 @@
 package com.github.kvdz00.keybindplus.gui;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.network.chat.Component;
 
 public class ConfirmPopup extends Screen {
@@ -25,18 +24,18 @@ public class ConfirmPopup extends Screen {
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.confirm"),
-            btn -> { onConfirm.run(); this.minecraft.setScreenAndShow(parent); }
+            btn -> { onConfirm.run(); this.minecraft.setScreen(parent); }
         ).bounds(centerX - 105, centerY + 10, 100, 20).build());
 
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.popup.cancel"),
-            btn -> this.minecraft.setScreenAndShow(parent)
+            btn -> this.minecraft.setScreen(parent)
         ).bounds(centerX + 5, centerY + 10, 100, 20).build());
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, this.height / 2 - 20, this.message);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.message, this.width / 2, this.height / 2 - 20, 0xFFFFFF);
     }
 }

@@ -10,13 +10,10 @@ import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public final class KeybindPlusClient {
-    public static final KeyMapping.Category KEYBIND_CATEGORY = KeyMapping.Category.register(
-        Identifier.fromNamespaceAndPath("keybindplus", "main")
-    );
+    public static final String KEYBIND_CATEGORY = "key.categories.keybindplus";
 
     public static final KeyMapping OPEN_GUI_KEY = new KeyMapping(
         "key.keybindplus.open_gui",
@@ -41,7 +38,7 @@ public final class KeybindPlusClient {
 
         ClientTickEvent.CLIENT_POST.register(client -> {
             if (OPEN_GUI_KEY.consumeClick()) {
-                Minecraft.getInstance().setScreenAndShow(new KeybindPlusScreen());
+                Minecraft.getInstance().setScreen(new KeybindPlusScreen());
             }
 
             if (QUICK_LOAD_KEY.consumeClick()) {

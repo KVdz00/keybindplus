@@ -4,15 +4,13 @@ import com.github.kvdz00.keybindplus.KeybindPlusClient;
 import com.github.kvdz00.keybindplus.config.KeybindPlusConfig;
 import com.github.kvdz00.keybindplus.keybind.*;
 import com.github.kvdz00.keybindplus.profile.*;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryStack;
@@ -273,14 +271,14 @@ public class KeybindPlusScreen extends Screen {
     }
 
     private void onSave() {
-        this.minecraft.execute(() -> this.minecraft.setScreenAndShow(new SaveProfilePopup(
+        this.minecraft.execute(() -> this.minecraft.setScreen(new SaveProfilePopup(
             this,
             Component.translatable("keybindplus.popup.save_title"),
             "",
             name -> {
                 ProfileManager pm = ProfileManager.get();
                 if (pm.profileExists(name)) {
-                    this.minecraft.setScreenAndShow(new ConfirmPopup(this,
+                    this.minecraft.setScreen(new ConfirmPopup(this,
                         Component.translatable("keybindplus.popup.confirm_overwrite", name),
                         () -> {
                             pm.saveProfile(name);
@@ -301,7 +299,7 @@ public class KeybindPlusScreen extends Screen {
 
         List<KeyConflict> conflicts = ConflictDetector.detect(profile);
         if (!conflicts.isEmpty()) {
-            this.minecraft.setScreenAndShow(new ConflictWarningPopup(this, profile, conflicts, () -> {
+            this.minecraft.setScreen(new ConflictWarningPopup(this, profile, conflicts, () -> {
                 applyProfile(profile);
             }));
         } else {
@@ -312,7 +310,7 @@ public class KeybindPlusScreen extends Screen {
     private void onEdit() {
         KeybindProfile profile = profileList.getSelectedProfile();
         if (profile == null) return;
-        this.minecraft.setScreenAndShow(new KeybindEditorScreen(this, profile, false));
+        this.minecraft.setScreen(new KeybindEditorScreen(this, profile, false));
     }
 
     private void applyProfile(KeybindProfile profile) {
@@ -331,7 +329,7 @@ public class KeybindPlusScreen extends Screen {
         KeybindProfile profile = profileList.getSelectedProfile();
         if (profile == null) return;
 
-        this.minecraft.setScreenAndShow(new ConfirmPopup(this,
+        this.minecraft.setScreen(new ConfirmPopup(this,
             Component.translatable("keybindplus.popup.confirm_delete", profile.getName()),
             () -> {
                 ProfileManager.get().deleteProfile(profile.getName());
@@ -399,7 +397,7 @@ public class KeybindPlusScreen extends Screen {
         if (profile == null) return;
 
         String oldName = profile.getName();
-        this.minecraft.execute(() -> this.minecraft.setScreenAndShow(new SaveProfilePopup(
+        this.minecraft.execute(() -> this.minecraft.setScreen(new SaveProfilePopup(
             this,
             Component.translatable("keybindplus.popup.rename_title"),
             oldName,
@@ -418,7 +416,7 @@ public class KeybindPlusScreen extends Screen {
         if (profile == null) return;
 
         String defaultCopyName = profile.getName() + " Copy";
-        this.minecraft.execute(() -> this.minecraft.setScreenAndShow(new SaveProfilePopup(
+        this.minecraft.execute(() -> this.minecraft.setScreen(new SaveProfilePopup(
             this,
             Component.translatable("keybindplus.popup.duplicate_title"),
             defaultCopyName,
@@ -444,9 +442,9 @@ public class KeybindPlusScreen extends Screen {
             return;
         }
 
-        this.minecraft.setScreenAndShow(new CompareSelectPopup(
+        this.minecraft.setScreen(new CompareSelectPopup(
             this, selected, otherProfiles,
-            target -> this.minecraft.setScreenAndShow(new CompareScreen(this, selected, target))
+            target -> this.minecraft.setScreen(new CompareScreen(this, selected, target))
         ));
     }
 
@@ -464,87 +462,88 @@ public class KeybindPlusScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.width / 2, 10, this.title);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 10, 0xFFFFFF);
 
         if (profileList != null && profileList.isEmpty()) {
             String query = getSearchQuery();
             Component emptyText = (query != null && !query.isBlank())
                 ? Component.translatable("keybindplus.screen.no_search_results")
                 : Component.translatable("keybindplus.screen.empty");
-            graphics.textRenderer().accept(
-                TextAlignment.CENTER,
+            graphics.drawCenteredString(
+                this.font,
+                emptyText.copy().withStyle(net.minecraft.ChatFormatting.GRAY),
                 this.width / 2,
                 this.height / 2 - 16,
-                emptyText.copy().withStyle(net.minecraft.ChatFormatting.GRAY)
+                0xAAAAAA
             );
         }
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (this.searchField != null && !this.searchField.isFocused()) {
-            if (KeybindPlusClient.OPEN_GUI_KEY.matches(event)) {
+            if (KeybindPlusClient.OPEN_GUI_KEY.matches(keyCode, scanCode)) {
                 this.onClose();
                 return true;
             }
 
             KeybindProfile selected = profileList != null ? profileList.getSelectedProfile() : null;
 
-            if (event.key() == GLFW.GLFW_KEY_DELETE || event.key() == GLFW.GLFW_KEY_BACKSPACE) {
+            if (keyCode == GLFW.GLFW_KEY_DELETE || keyCode == GLFW.GLFW_KEY_BACKSPACE) {
                 if (selected != null) {
                     onDelete();
                     return true;
                 }
             }
 
-            if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_KP_ENTER) {
+            if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
                 if (selected != null) {
                     onLoad();
                     return true;
                 }
             }
 
-            boolean ctrl = isCtrlDown();
+            boolean ctrl = hasControlDown();
 
             if (ctrl) {
-                if (event.key() == GLFW.GLFW_KEY_S) {
+                if (keyCode == GLFW.GLFW_KEY_S) {
                     onSave();
                     return true;
                 }
-                if (event.key() == GLFW.GLFW_KEY_Z) {
+                if (keyCode == GLFW.GLFW_KEY_Z) {
                     if (KeybindApplier.hasUndoSnapshot()) {
                         onUndo();
                         return true;
                     }
                 }
-                if (event.key() == GLFW.GLFW_KEY_D) {
+                if (keyCode == GLFW.GLFW_KEY_D) {
                     if (selected != null) {
                         onDuplicate();
                         return true;
                     }
                 }
             } else {
-                if (event.key() == GLFW.GLFW_KEY_E) {
+                if (keyCode == GLFW.GLFW_KEY_E) {
                     if (selected != null) {
                         onEdit();
                         return true;
                     }
                 }
-                if (event.key() == GLFW.GLFW_KEY_C) {
+                if (keyCode == GLFW.GLFW_KEY_C) {
                     if (selected != null) {
                         onCompare();
                         return true;
                     }
                 }
-                if (event.key() == GLFW.GLFW_KEY_R) {
+                if (keyCode == GLFW.GLFW_KEY_R) {
                     if (selected != null) {
                         onRename();
                         return true;
                     }
                 }
-                if (event.key() == GLFW.GLFW_KEY_D) {
+                if (keyCode == GLFW.GLFW_KEY_D) {
                     if (selected != null) {
                         onSetDefault();
                         return true;
@@ -552,13 +551,7 @@ public class KeybindPlusScreen extends Screen {
                 }
             }
         }
-        return super.keyPressed(event);
-    }
-
-    private static boolean isCtrlDown() {
-        long window = net.minecraft.client.Minecraft.getInstance().getWindow().handle();
-        return GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS
-            || GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_CONTROL) == GLFW.GLFW_PRESS;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
