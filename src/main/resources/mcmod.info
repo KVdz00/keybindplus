@@ -1,8 +1,8 @@
 [
   {
     "modid": "keybindplus",
-    "name": "KeybindPlus",
-    "description": "Keybind profile manager for PvP & modded Minecraft players. Save, load, compare, and share keybind profiles.",
+    "name": "KeybindPlus (Alpha)",
+    "description": "[EXPERIMENTAL ALPHA] Keybind profile manager for Minecraft 1.8.9 Forge PvP. Save, load, compare, and edit keybind profiles.",
     "version": "${version}",
     "mcversion": "1.8.9",
     "url": "https://github.com/KVdz00/keybindplus",
