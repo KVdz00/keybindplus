@@ -21,12 +21,8 @@ jobs:
           REF="${{ github.ref_name }}"
           if [ "$REF" = "main" ]; then
             echo "java_version=25" >> $GITHUB_OUTPUT
-          elif [ "$REF" = "1.21.x" ]; then
-            echo "java_version=21" >> $GITHUB_OUTPUT
-          elif [ "$REF" = "1.8.9" ]; then
-            echo "java_version=8" >> $GITHUB_OUTPUT
           else
-            echo "java_version=17" >> $GITHUB_OUTPUT
+            echo "java_version=21" >> $GITHUB_OUTPUT
           fi
 
       - name: Set up JDK
