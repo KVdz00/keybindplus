@@ -53,7 +53,6 @@ public class KeybindEditorScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        // Top controls: Search box + Filter button
         this.searchField = new EditBox(this.font, centerX - 154, 26, 170, 18,
             Component.translatable("keybindplus.editor.search"));
         this.searchField.setHint(Component.translatable("keybindplus.editor.search"));
@@ -71,12 +70,10 @@ public class KeybindEditorScreen extends Screen {
         .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.editor_filter")))
         .build());
 
-        // Keybind scroll list
         this.listWidget = new KeybindEditListWidget(this.minecraft, this,
             this.width, this.height, 48, this.height - 38, 28);
         this.addRenderableWidget(this.listWidget);
 
-        // Bottom action buttons
         int btnY = this.height - 30;
         this.addRenderableWidget(Button.builder(
             Component.translatable("keybindplus.editor.save_apply"),
@@ -139,12 +136,10 @@ public class KeybindEditorScreen extends Screen {
             String keyName = entry.getValue();
             String category = actionCategories.getOrDefault(actionId, "");
 
-            // Filter conflicts
             if (conflictsOnly && !conflictMap.containsKey(actionId)) {
                 continue;
             }
 
-            // Filter search query
             if (!query.isEmpty()) {
                 boolean matchAction = actionId.toLowerCase().contains(query);
                 boolean matchCategory = category.toLowerCase().contains(query);

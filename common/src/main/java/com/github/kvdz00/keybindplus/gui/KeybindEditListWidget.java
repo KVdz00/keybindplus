@@ -50,7 +50,6 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
         public KeybindEntry(KeybindRowData data, boolean isConflicted, List<String> conflictingActions, boolean isListening) {
             this.data = data;
 
-            // Key display label
             Component keyLabel;
             if (isListening) {
                 keyLabel = Component.translatable("keybindplus.editor.press_key")
@@ -79,7 +78,6 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
                 ));
             }
 
-            // Unbind button
             boolean isAlreadyNone = isUnknownKey(data.keyName());
             this.unbindButton = Button.builder(
                 Component.translatable("keybindplus.editor.unbind"),
@@ -99,7 +97,6 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
             int rowY = top;
             int rowWidth = KeybindEditListWidget.this.getRowWidth();
 
-            // Position buttons on the right side
             int unbindX = left + rowWidth - 46;
             int keyX = unbindX - 88;
 
@@ -111,7 +108,6 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
             this.unbindButton.setY(rowY + 4);
             this.unbindButton.render(graphics, mouseX, mouseY, partialTick);
 
-            // Action name (left side)
             MutableComponent actionText = Component.translatable(data.actionId());
             if (isListening()) {
                 actionText = actionText.withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
@@ -119,7 +115,6 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
 
             graphics.drawString(Minecraft.getInstance().font, actionText, rowX, rowY + 4, 0xFFFFFF, false);
 
-            // Category tag (small below action name)
             String cat = data.category();
             if (cat != null && !cat.isBlank()) {
                 graphics.drawString(Minecraft.getInstance().font,
