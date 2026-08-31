@@ -1,10 +1,10 @@
 package com.github.kvdz00.keybindplus.gui;
 
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -79,7 +79,7 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
         }
 
         @Override
-        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+        public void render(PoseStack poseStack, int index, int top, int left, int width, int height,
                            int mouseX, int mouseY, boolean hovering, float partialTick) {
             ChatFormatting nameColor;
             if (profile.isLoaded()) {
@@ -102,9 +102,9 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
                 meta += " | " + timeAgo + " ago";
             }
 
-            graphics.drawString(ProfileListWidget.this.minecraft.font, title, left + 6, top + 3, 0xFFFFFF, false);
-            graphics.drawString(ProfileListWidget.this.minecraft.font, Component.literal(meta).withStyle(ChatFormatting.DARK_GRAY),
-                left + 6, top + 14, 0x888888, false);
+            ProfileListWidget.this.minecraft.font.draw(poseStack, title, left + 6, top + 3, 0xFFFFFF);
+            ProfileListWidget.this.minecraft.font.draw(poseStack, Component.literal(meta).withStyle(ChatFormatting.DARK_GRAY),
+                left + 6, top + 14, 0x888888);
         }
 
         @Override

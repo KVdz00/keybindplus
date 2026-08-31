@@ -1,6 +1,6 @@
 package com.github.kvdz00.keybindplus.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -41,15 +41,17 @@ public class SaveProfilePopup extends Screen {
         this.addRenderableWidget(this.nameField);
         this.setInitialFocus(this.nameField);
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX - 105, centerY + 20, 100, 20,
             Component.translatable("keybindplus.popup.save"),
             btn -> doSave()
-        ).bounds(centerX - 105, centerY + 20, 100, 20).build());
+        ));
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX + 5, centerY + 20, 100, 20,
             Component.translatable("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
-        ).bounds(centerX + 5, centerY + 20, 100, 20).build());
+        ));
     }
 
     private void doSave() {
@@ -61,9 +63,10 @@ public class SaveProfilePopup extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 35, 0xFFFFFF);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, delta);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, this.height / 2 - 35, 0xFFFFFF);
     }
 
     @Override

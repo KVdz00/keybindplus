@@ -2,8 +2,8 @@ package com.github.kvdz00.keybindplus.gui;
 
 import com.github.kvdz00.keybindplus.keybind.KeyConflict;
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,38 +30,40 @@ public class ConflictWarningPopup extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        // Scrollable conflict list
         this.conflictList = new ConflictListWidget(this.minecraft, this.width, this.height, 48, this.height - 36, 20);
         for (KeyConflict conflict : conflicts) {
             this.conflictList.addConflict(conflict);
         }
         this.addRenderableWidget(this.conflictList);
 
-        // Action buttons fixed at the bottom: Apply Anyway, Resolve Conflicts, Cancel
         int btnY = this.height - 30;
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX - 154, btnY, 96, 20,
             Component.translatable("keybindplus.popup.conflict_apply"),
             btn -> { onApply.run(); this.minecraft.setScreen(parent); }
-        ).bounds(centerX - 154, btnY, 96, 20).build());
+        ));
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX - 54, btnY, 114, 20,
             Component.translatable("keybindplus.popup.conflict_resolve"),
             btn -> this.minecraft.setScreen(new KeybindEditorScreen(parent, profile, true))
-        ).bounds(centerX - 54, btnY, 114, 20).build());
+        ));
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX + 64, btnY, 90, 20,
             Component.translatable("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
-        ).bounds(centerX + 64, btnY, 90, 20).build());
+        ));
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, delta);
         int centerX = this.width / 2;
 
-        graphics.drawCenteredString(this.font, this.title, centerX, 12, 0xFFFFFF);
-        graphics.drawCenteredString(this.font, Component.translatable("keybindplus.popup.conflict_subtitle"), centerX, 28, 0xAAAAAA);
+        drawCenteredString(poseStack, this.font, this.title, centerX, 12, 0xFFFFFF);
+        drawCenteredString(poseStack, this.font, Component.translatable("keybindplus.popup.conflict_subtitle"), centerX, 28, 0xAAAAAA);
     }
 
     public static class ConflictListWidget extends ObjectSelectionList<ConflictListWidget.ConflictEntry> {
@@ -86,14 +88,14 @@ public class ConflictWarningPopup extends Screen {
             }
 
             @Override
-            public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+            public void render(PoseStack poseStack, int index, int top, int left, int width, int height,
                                int mouseX, int mouseY, boolean hovering, float partialTick) {
                 String keyDisplay = "[" + formatKey(conflict.key()) + "]";
                 String actionsDisplay = String.join(", ", conflict.actions().stream()
                     .map(this::formatAction).toList());
 
-                graphics.drawString(Minecraft.getInstance().font,
-                    Component.literal(keyDisplay + "  ->  " + actionsDisplay), left + 6, top + 4, 0xFFFFFF, false);
+                Minecraft.getInstance().font.draw(poseStack,
+                    Component.literal(keyDisplay + "  ->  " + actionsDisplay), left + 6, top + 4, 0xFFFFFF);
             }
 
             @Override
@@ -111,7 +113,10 @@ public class ConflictWarningPopup extends Screen {
             }
 
             private String formatAction(String action) {
-                return action.startsWith("key.") ? action.substring(4) : action;
+                return action
+                    .replace("key.", "")
+                    .replace('.', ' ')
+                    .replace('_', ' ');
             }
         }
     }

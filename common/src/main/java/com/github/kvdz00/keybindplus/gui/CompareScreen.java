@@ -4,14 +4,14 @@ import com.github.kvdz00.keybindplus.keybind.KeybindApplier;
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import com.github.kvdz00.keybindplus.profile.ProfileManager;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
@@ -72,29 +72,29 @@ public class CompareScreen extends Screen {
 
         this.searchField = new EditBox(this.font, centerX - 190, 24, 190, 18,
             Component.translatable("keybindplus.compare.search"));
-        this.searchField.setHint(Component.translatable("keybindplus.compare.search"));
         this.searchField.setResponder(q -> refreshList());
         this.addRenderableWidget(this.searchField);
 
-        this.filterButton = this.addRenderableWidget(Button.builder(
+        this.filterButton = this.addRenderableWidget(new Button(
+            centerX + 10, 23, 180, 20,
             getFilterButtonLabel(),
             btn -> {
                 this.diffsOnly = !this.diffsOnly;
                 this.filterButton.setMessage(getFilterButtonLabel());
                 refreshList();
-            }
-        ).bounds(centerX + 10, 23, 180, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.compare_filter")))
-        .build());
+            },
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.compare_filter"), mx, my)
+        ));
 
         this.listWidget = new CompareListWidget(this.minecraft, this,
             this.width, this.height, 58, this.height - 34, 28);
         this.addRenderableWidget(this.listWidget);
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX - 50, this.height - 28, 100, 20,
             Component.translatable("keybindplus.screen.done"),
             btn -> this.minecraft.setScreen(parent)
-        ).bounds(centerX - 50, this.height - 28, 100, 20).build());
+        ));
 
         refreshList();
     }
@@ -151,9 +151,10 @@ public class CompareScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 8, 0xFFFFFF);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, delta);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 8, 0xFFFFFF);
 
         int centerX = this.width / 2;
         int headerY = 46;
@@ -167,17 +168,17 @@ public class CompareScreen extends Screen {
         ChatFormatting colorA = profileA.isLoaded() ? ChatFormatting.GREEN : (profileA.isImported() ? ChatFormatting.AQUA : ChatFormatting.WHITE);
         ChatFormatting colorB = profileB.isLoaded() ? ChatFormatting.GREEN : (profileB.isImported() ? ChatFormatting.AQUA : (profileB.isDefault() ? ChatFormatting.GOLD : ChatFormatting.WHITE));
 
-        graphics.drawString(this.font,
+        this.font.draw(poseStack,
             Component.translatable("keybindplus.compare.action").withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD),
-            colActionX, headerY, 0xAAAAAA, false);
-        graphics.drawString(this.font,
+            colActionX, headerY, 0xAAAAAA);
+        this.font.draw(poseStack,
             Component.literal(truncate(profileA.getName(), 12)).withStyle(colorA, ChatFormatting.BOLD),
-            colA_X, headerY, 0xFFFFFF, false);
-        graphics.drawString(this.font,
+            colA_X, headerY, 0xFFFFFF);
+        this.font.draw(poseStack,
             Component.literal(truncate(profileB.getName(), 12)).withStyle(colorB, ChatFormatting.BOLD),
-            colB_X, headerY, 0xFFFFFF, false);
+            colB_X, headerY, 0xFFFFFF);
 
-        graphics.fill(startX, headerY + 10, startX + rowWidth, headerY + 11, 0xFF444444);
+        fill(poseStack, startX, headerY + 10, startX + rowWidth, headerY + 11, 0xFF444444);
     }
 
     private static String truncate(String text, int maxLen) {
@@ -246,19 +247,19 @@ public class CompareScreen extends Screen {
             Entry(CompareRowData data) {
                 this.data = data;
                 if (data.different()) {
-                    this.syncToAButton = Button.builder(
+                    this.syncToAButton = new Button(
+                        0, 0, 16, 16,
                         Component.literal("<"),
-                        btn -> syncKey(data.actionId(), data.valueB(), profileA)
-                    ).bounds(0, 0, 16, 16)
-                    .tooltip(Tooltip.create(Component.translatable("keybindplus.compare.copy_to_a", profileA.getName())))
-                    .build();
+                        btn -> syncKey(data.actionId(), data.valueB(), profileA),
+                        (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.compare.copy_to_a", profileA.getName()), mx, my)
+                    );
 
-                    this.syncToBButton = Button.builder(
+                    this.syncToBButton = new Button(
+                        0, 0, 16, 16,
                         Component.literal(">"),
-                        btn -> syncKey(data.actionId(), data.valueA(), profileB)
-                    ).bounds(0, 0, 16, 16)
-                    .tooltip(Tooltip.create(Component.translatable("keybindplus.compare.copy_to_b", profileB.getName())))
-                    .build();
+                        btn -> syncKey(data.actionId(), data.valueA(), profileB),
+                        (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.compare.copy_to_b", profileB.getName()), mx, my)
+                    );
 
                     this.children = List.of(this.syncToAButton, this.syncToBButton);
                 } else {
@@ -269,7 +270,7 @@ public class CompareScreen extends Screen {
             }
 
             @Override
-            public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+            public void render(PoseStack poseStack, int index, int top, int left, int width, int height,
                                int mouseX, int mouseY, boolean hovering, float partialTick) {
                 int baseX = left;
                 int rowY = top;
@@ -282,21 +283,21 @@ public class CompareScreen extends Screen {
                 int colB_X = baseX + 292;
 
                 if (data.different()) {
-                    graphics.fill(baseX, rowY + 1, baseX + rowWidth, rowY + 27, 0x25FFAA00);
-                    graphics.fill(baseX, rowY + 1, baseX + 2, rowY + 27, 0xFFFFAA00);
+                    GuiComponent.fill(poseStack, baseX, rowY + 1, baseX + rowWidth, rowY + 27, 0x25FFAA00);
+                    GuiComponent.fill(poseStack, baseX, rowY + 1, baseX + 2, rowY + 27, 0xFFFFAA00);
 
                     if (syncToAButton != null) {
-                        syncToAButton.setX(syncA_X);
-                        syncToAButton.setY(rowY + 6);
-                        syncToAButton.render(graphics, mouseX, mouseY, partialTick);
+                        syncToAButton.x = syncA_X;
+                        syncToAButton.y = rowY + 6;
+                        syncToAButton.render(poseStack, mouseX, mouseY, partialTick);
                     }
                     if (syncToBButton != null) {
-                        syncToBButton.setX(syncB_X);
-                        syncToBButton.setY(rowY + 6);
-                        syncToBButton.render(graphics, mouseX, mouseY, partialTick);
+                        syncToBButton.x = syncB_X;
+                        syncToBButton.y = rowY + 6;
+                        syncToBButton.render(poseStack, mouseX, mouseY, partialTick);
                     }
                 } else if (hovering) {
-                    graphics.fill(baseX, rowY + 1, baseX + rowWidth, rowY + 27, 0x12FFFFFF);
+                    GuiComponent.fill(poseStack, baseX, rowY + 1, baseX + rowWidth, rowY + 27, 0x12FFFFFF);
                 }
 
                 MutableComponent actionText = Component.translatable(data.actionId());
@@ -305,12 +306,12 @@ public class CompareScreen extends Screen {
                 } else {
                     actionText = actionText.withStyle(ChatFormatting.WHITE);
                 }
-                graphics.drawString(Minecraft.getInstance().font, actionText, colActionX, rowY + 4, 0xFFFFFF, false);
+                Minecraft.getInstance().font.draw(poseStack, actionText, colActionX, rowY + 4, 0xFFFFFF);
 
                 String category = actionCategories.getOrDefault(data.actionId(), "");
                 if (!category.isEmpty()) {
-                    graphics.drawString(Minecraft.getInstance().font,
-                        Component.literal(category).withStyle(ChatFormatting.DARK_GRAY), colActionX, rowY + 15, 0x888888, false);
+                    Minecraft.getInstance().font.draw(poseStack,
+                        Component.literal(category).withStyle(ChatFormatting.DARK_GRAY), colActionX, rowY + 15, 0x888888);
                 }
 
                 String keyA = formatKeyName(data.valueA());
@@ -320,7 +321,7 @@ public class CompareScreen extends Screen {
                 } else {
                     textA = textA.withStyle(checkUnknownKey(data.valueA()) ? ChatFormatting.DARK_GRAY : ChatFormatting.GRAY);
                 }
-                graphics.drawString(Minecraft.getInstance().font, textA, colA_X, rowY + 8, 0xFFFFFF, false);
+                Minecraft.getInstance().font.draw(poseStack, textA, colA_X, rowY + 8, 0xFFFFFF);
 
                 String keyB = formatKeyName(data.valueB());
                 MutableComponent textB = Component.literal(keyB);
@@ -329,7 +330,7 @@ public class CompareScreen extends Screen {
                 } else {
                     textB = textB.withStyle(checkUnknownKey(data.valueB()) ? ChatFormatting.DARK_GRAY : ChatFormatting.GRAY);
                 }
-                graphics.drawString(Minecraft.getInstance().font, textB, colB_X, rowY + 8, 0xFFFFFF, false);
+                Minecraft.getInstance().font.draw(poseStack, textB, colB_X, rowY + 8, 0xFFFFFF);
             }
 
             @Override

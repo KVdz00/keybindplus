@@ -4,11 +4,10 @@ import com.github.kvdz00.keybindplus.keybind.KeybindApplier;
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
 import com.github.kvdz00.keybindplus.profile.ProfileManager;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
@@ -40,7 +39,6 @@ public class KeybindEditorScreen extends Screen {
         this.conflictsOnly = startWithConflictsOnly;
         this.workingKeybinds = new LinkedHashMap<>(profile.getKeybinds());
 
-        // Cache category names from game options
         var options = net.minecraft.client.Minecraft.getInstance().options;
         if (options != null && options.keyMappings != null) {
             for (KeyMapping km : options.keyMappings) {
@@ -53,49 +51,46 @@ public class KeybindEditorScreen extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        // Top controls: Search box + Filter button
         this.searchField = new EditBox(this.font, centerX - 154, 26, 170, 18,
             Component.translatable("keybindplus.editor.search"));
-        this.searchField.setHint(Component.translatable("keybindplus.editor.search"));
         this.searchField.setResponder(q -> refreshList());
         this.addRenderableWidget(this.searchField);
 
-        this.filterButton = this.addRenderableWidget(Button.builder(
+        this.filterButton = this.addRenderableWidget(new Button(
+            centerX + 24, 25, 130, 20,
             getFilterButtonLabel(),
             btn -> {
                 this.conflictsOnly = !this.conflictsOnly;
                 this.filterButton.setMessage(getFilterButtonLabel());
                 refreshList();
-            }
-        ).bounds(centerX + 24, 25, 130, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.editor_filter")))
-        .build());
+            },
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.editor_filter"), mx, my)
+        ));
 
-        // Keybind scroll list
         this.listWidget = new KeybindEditListWidget(this.minecraft, this,
             this.width, this.height, 48, this.height - 38, 28);
         this.addRenderableWidget(this.listWidget);
 
-        // Bottom action buttons
         int btnY = this.height - 30;
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX - 154, btnY, 100, 20,
             Component.translatable("keybindplus.editor.save_apply"),
-            btn -> onSaveAndApply()
-        ).bounds(centerX - 154, btnY, 100, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.editor_save_apply")))
-        .build());
+            btn -> onSaveAndApply(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.editor_save_apply"), mx, my)
+        ));
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX - 50, btnY, 96, 20,
             Component.translatable("keybindplus.popup.save"),
-            btn -> onSaveOnly()
-        ).bounds(centerX - 50, btnY, 96, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.save")))
-        .build());
+            btn -> onSaveOnly(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.save"), mx, my)
+        ));
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX + 50, btnY, 104, 20,
             Component.translatable("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
-        ).bounds(centerX + 50, btnY, 104, 20).build());
+        ));
 
         refreshList();
     }
@@ -139,12 +134,10 @@ public class KeybindEditorScreen extends Screen {
             String keyName = entry.getValue();
             String category = actionCategories.getOrDefault(actionId, "");
 
-            // Filter conflicts
             if (conflictsOnly && !conflictMap.containsKey(actionId)) {
                 continue;
             }
 
-            // Filter search query
             if (!query.isEmpty()) {
                 boolean matchAction = actionId.toLowerCase().contains(query);
                 boolean matchCategory = category.toLowerCase().contains(query);
@@ -234,9 +227,10 @@ public class KeybindEditorScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 10, 0xFFFFFF);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, delta);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 10, 0xFFFFFF);
     }
 
     @Override

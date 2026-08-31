@@ -4,10 +4,9 @@ import com.github.kvdz00.keybindplus.KeybindPlusClient;
 import com.github.kvdz00.keybindplus.config.KeybindPlusConfig;
 import com.github.kvdz00.keybindplus.keybind.*;
 import com.github.kvdz00.keybindplus.profile.*;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.Util;
@@ -80,28 +79,26 @@ public class KeybindPlusScreen extends Screen {
         // Top Row: Search field (168px), Sort button (68px), Folder button (64px) -> Total 308px
         this.searchField = new EditBox(this.font, centerX - 154, 26, 168, 18,
             Component.translatable("keybindplus.screen.search"));
-        this.searchField.setHint(Component.translatable("keybindplus.screen.search"));
         this.searchField.setResponder(query -> refreshList());
         this.addRenderableWidget(this.searchField);
 
-        this.sortButton = this.addRenderableWidget(Button.builder(
+        this.sortButton = this.addRenderableWidget(new Button(
+            centerX + 18, 25, 68, 20,
             currentSort.getDisplayName(),
             btn -> {
                 currentSort = currentSort.next();
                 btn.setMessage(currentSort.getDisplayName());
-                btn.setTooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.sort", currentSort.getDisplayName())));
                 refreshList();
-            }
-        ).bounds(centerX + 18, 25, 68, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.sort", currentSort.getDisplayName())))
-        .build());
+            },
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.sort", currentSort.getDisplayName()), mx, my)
+        ));
 
-        this.openFolderButton = this.addRenderableWidget(Button.builder(
+        this.openFolderButton = this.addRenderableWidget(new Button(
+            centerX + 90, 25, 64, 20,
             Component.translatable("keybindplus.screen.open_folder"),
-            btn -> onOpenFolder()
-        ).bounds(centerX + 90, 25, 64, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.open_folder")))
-        .build());
+            btn -> onOpenFolder(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.open_folder"), mx, my)
+        ));
 
         // Profile list
         this.profileList = new ProfileListWidget(this.minecraft, this,
@@ -110,91 +107,96 @@ public class KeybindPlusScreen extends Screen {
 
         // Row 1: Core Primary Actions (3 buttons, 100px each, gap 4px = 308px)
         int btnY1 = this.height - 76;
-        this.loadButton = this.addRenderableWidget(Button.builder(
+        this.loadButton = this.addRenderableWidget(new Button(
+            centerX - 154, btnY1, 100, 20,
             Component.translatable("keybindplus.screen.load"),
-            btn -> onLoad()
-        ).bounds(centerX - 154, btnY1, 100, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.load")))
-        .build());
+            btn -> onLoad(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.load"), mx, my)
+        ));
 
-        this.editButton = this.addRenderableWidget(Button.builder(
+        this.editButton = this.addRenderableWidget(new Button(
+            centerX - 50, btnY1, 100, 20,
             Component.translatable("keybindplus.screen.edit"),
-            btn -> onEdit()
-        ).bounds(centerX - 50, btnY1, 100, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.edit")))
-        .build());
+            btn -> onEdit(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.edit"), mx, my)
+        ));
 
-        this.undoButton = this.addRenderableWidget(Button.builder(
+        this.undoButton = this.addRenderableWidget(new Button(
+            centerX + 54, btnY1, 100, 20,
             Component.translatable("keybindplus.screen.undo"),
-            btn -> onUndo()
-        ).bounds(centerX + 54, btnY1, 100, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.undo")))
-        .build());
+            btn -> onUndo(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.undo"), mx, my)
+        ));
 
         // Row 2: Profile Management Actions (4 buttons, 74px each, gap 4px = 308px)
         int btnY2 = this.height - 52;
-        this.saveButton = this.addRenderableWidget(Button.builder(
+        this.saveButton = this.addRenderableWidget(new Button(
+            centerX - 154, btnY2, 74, 20,
             Component.translatable("keybindplus.screen.save"),
-            btn -> onSave()
-        ).bounds(centerX - 154, btnY2, 74, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.save")))
-        .build());
+            btn -> onSave(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.save"), mx, my)
+        ));
 
-        this.duplicateButton = this.addRenderableWidget(Button.builder(
+        this.duplicateButton = this.addRenderableWidget(new Button(
+            centerX - 76, btnY2, 74, 20,
             Component.translatable("keybindplus.screen.duplicate"),
-            btn -> onDuplicate()
-        ).bounds(centerX - 76, btnY2, 74, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.duplicate")))
-        .build());
+            btn -> onDuplicate(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.duplicate"), mx, my)
+        ));
 
-        this.renameButton = this.addRenderableWidget(Button.builder(
+        this.renameButton = this.addRenderableWidget(new Button(
+            centerX + 2, btnY2, 74, 20,
             Component.translatable("keybindplus.screen.rename"),
-            btn -> onRename()
-        ).bounds(centerX + 2, btnY2, 74, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.rename")))
-        .build());
+            btn -> onRename(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.rename"), mx, my)
+        ));
 
-        this.deleteButton = this.addRenderableWidget(Button.builder(
+        this.deleteButton = this.addRenderableWidget(new Button(
+            centerX + 80, btnY2, 74, 20,
             Component.translatable("keybindplus.screen.delete"),
-            btn -> onDelete()
-        ).bounds(centerX + 80, btnY2, 74, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.delete")))
-        .build());
+            btn -> onDelete(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.delete"), mx, my)
+        ));
 
         // Row 3: Tools & Navigation (5 buttons, 58px each, gap 4px = 306px, centered)
         int btnY3 = this.height - 28;
-        this.compareButton = this.addRenderableWidget(Button.builder(
+        this.compareButton = this.addRenderableWidget(new Button(
+            centerX - 153, btnY3, 58, 20,
             Component.translatable("keybindplus.screen.compare"),
-            btn -> onCompare()
-        ).bounds(centerX - 153, btnY3, 58, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.compare")))
-        .build());
+            btn -> onCompare(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.compare"), mx, my)
+        ));
 
-        this.setDefaultButton = this.addRenderableWidget(Button.builder(
+        this.setDefaultButton = this.addRenderableWidget(new Button(
+            centerX - 91, btnY3, 58, 20,
             Component.translatable("keybindplus.screen.set_default"),
-            btn -> onSetDefault()
-        ).bounds(centerX - 91, btnY3, 58, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.set_default")))
-        .build());
+            btn -> onSetDefault(),
+            (btn, poseStack, mx, my) -> {
+                KeybindProfile sel = profileList != null ? profileList.getSelectedProfile() : null;
+                boolean isDef = sel != null && sel.isDefault();
+                renderTooltip(poseStack, Component.translatable(isDef ? "keybindplus.tooltip.unset_default" : "keybindplus.tooltip.set_default"), mx, my);
+            }
+        ));
 
-        this.importButton = this.addRenderableWidget(Button.builder(
+        this.importButton = this.addRenderableWidget(new Button(
+            centerX - 29, btnY3, 58, 20,
             Component.translatable("keybindplus.screen.import"),
-            btn -> onImport()
-        ).bounds(centerX - 29, btnY3, 58, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.import")))
-        .build());
+            btn -> onImport(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.import"), mx, my)
+        ));
 
-        this.exportButton = this.addRenderableWidget(Button.builder(
+        this.exportButton = this.addRenderableWidget(new Button(
+            centerX + 33, btnY3, 58, 20,
             Component.translatable("keybindplus.screen.export"),
-            btn -> onExport()
-        ).bounds(centerX + 33, btnY3, 58, 20)
-        .tooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.export")))
-        .build());
+            btn -> onExport(),
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.export"), mx, my)
+        ));
 
-        this.doneButton = this.addRenderableWidget(Button.builder(
+        this.doneButton = this.addRenderableWidget(new Button(
+            centerX + 95, btnY3, 58, 20,
             Component.translatable("keybindplus.screen.done"),
             btn -> this.onClose()
-        ).bounds(centerX + 95, btnY3, 58, 20).build());
+        ));
 
         refreshList();
     }
@@ -255,10 +257,8 @@ public class KeybindPlusScreen extends Screen {
                 boolean isDef = selected != null && selected.isDefault();
                 if (isDef) {
                     setDefaultButton.setMessage(Component.translatable("keybindplus.screen.unset_default"));
-                    setDefaultButton.setTooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.unset_default")));
                 } else {
                     setDefaultButton.setMessage(Component.translatable("keybindplus.screen.set_default"));
-                    setDefaultButton.setTooltip(Tooltip.create(Component.translatable("keybindplus.tooltip.set_default")));
                 }
             }
         }
@@ -462,16 +462,18 @@ public class KeybindPlusScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 10, 0xFFFFFF);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, delta);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 10, 0xFFFFFF);
 
         if (profileList != null && profileList.isEmpty()) {
             String query = getSearchQuery();
             Component emptyText = (query != null && !query.isBlank())
                 ? Component.translatable("keybindplus.screen.no_search_results")
                 : Component.translatable("keybindplus.screen.empty");
-            graphics.drawCenteredString(
+            drawCenteredString(
+                poseStack,
                 this.font,
                 emptyText.copy().withStyle(net.minecraft.ChatFormatting.GRAY),
                 this.width / 2,

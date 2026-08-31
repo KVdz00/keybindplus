@@ -1,10 +1,10 @@
 package com.github.kvdz00.keybindplus.gui;
 
 import com.github.kvdz00.keybindplus.profile.KeybindProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
@@ -44,7 +44,8 @@ public class CompareSelectPopup extends Screen {
         this.addRenderableWidget(this.listWidget);
 
         int btnY = this.height - 32;
-        this.compareButton = this.addRenderableWidget(Button.builder(
+        this.compareButton = this.addRenderableWidget(new Button(
+            centerX - 105, btnY, 100, 20,
             Component.translatable("keybindplus.screen.compare"),
             btn -> {
                 KeybindProfile target = listWidget.getSelectedProfile();
@@ -52,13 +53,14 @@ public class CompareSelectPopup extends Screen {
                     onTargetSelected.accept(target);
                 }
             }
-        ).bounds(centerX - 105, btnY, 100, 20).build());
+        ));
         this.compareButton.active = false;
 
-        this.addRenderableWidget(Button.builder(
+        this.addRenderableWidget(new Button(
+            centerX + 5, btnY, 100, 20,
             Component.translatable("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
-        ).bounds(centerX + 5, btnY, 100, 20).build());
+        ));
 
         if (!candidateProfiles.isEmpty()) {
             this.listWidget.setSelected(this.listWidget.children().get(0));
@@ -73,16 +75,17 @@ public class CompareSelectPopup extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 12, 0xFFFFFF);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, delta);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 12, 0xFFFFFF);
 
         ChatFormatting sourceColor = sourceProfile.isLoaded() ? ChatFormatting.GREEN : (sourceProfile.isImported() ? ChatFormatting.AQUA : ChatFormatting.WHITE);
         MutableComponent sub = Component.translatable(
             "keybindplus.popup.compare_subtitle",
             Component.literal(sourceProfile.getName()).withStyle(sourceColor, ChatFormatting.BOLD)
         );
-        graphics.drawCenteredString(this.font, sub, this.width / 2, 28, 0xFFFFFF);
+        drawCenteredString(poseStack, this.font, sub, this.width / 2, 28, 0xFFFFFF);
     }
 
     @Override
@@ -124,7 +127,7 @@ public class CompareSelectPopup extends Screen {
             }
 
             @Override
-            public void render(GuiGraphics graphics, int index, int top, int left, int width, int height,
+            public void render(PoseStack poseStack, int index, int top, int left, int width, int height,
                                int mouseX, int mouseY, boolean hovering, float partialTick) {
                 ChatFormatting nameColor;
                 if (profile.isLoaded()) {
@@ -140,7 +143,7 @@ public class CompareSelectPopup extends Screen {
                     text.append(Component.literal(" \u2605").withStyle(ChatFormatting.GOLD));
                 }
 
-                graphics.drawString(CompareSelectPopup.this.minecraft.font, text, left + 6, top + 6, 0xFFFFFF, false);
+                CompareSelectPopup.this.minecraft.font.draw(poseStack, text, left + 6, top + 6, 0xFFFFFF);
             }
 
             @Override
