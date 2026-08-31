@@ -9,12 +9,12 @@ KeybindPlus follows standard Minecraft modding practices by maintaining version-
 | Minecraft Version | Branch | Mod Loader(s) | Status | Java Version |
 | :--- | :--- | :--- | :--- | :--- |
 | **26.2 (Active)** | `main` | Fabric, NeoForge | Supported (v1.2.0) | Java 25 |
-| **1.21.x** | `1.21.x` | Fabric, NeoForge | Planned | Java 21 |
-| **1.20.x** | `1.20.x` | Fabric, Forge / NeoForge | Planned | Java 17 |
-| **1.19.x** | `1.19.x` | Fabric, Forge | Planned | Java 17 |
-| **1.18.x** | `1.18.x` | Fabric, Forge | Planned | Java 17 |
-| **1.17.x** | `1.17.x` | Fabric, Forge | Planned | Java 16 / 17 |
-| **1.8.9 (Old PvP)** | `1.8.9` | Forge 1.8.9 | Planned | Java 8 |
+| **1.21.x (1.21 - 1.21.11)** | `1.21.x` | Fabric, NeoForge | Supported (v1.2.0) | Java 21 |
+| **1.20.x (1.20 - 1.20.4)** | `1.20.x` | Fabric, Forge | Supported (v1.2.0) | Java 17 |
+| **1.19.x (1.19 - 1.19.4)** | `1.19.x` | Fabric, Forge | Supported (v1.2.0) | Java 17 |
+| **1.18.x (1.18 - 1.18.2)** | `1.18.x` | Fabric, Forge | Supported (v1.2.0) | Java 17 |
+| **1.17.x (1.17 - 1.17.1)** | `1.17.x` | Fabric, Forge | Supported (v1.2.0) | Java 16 / 17 |
+| **1.8.9 (Old PvP)** | `1.8.9` | Forge 1.8.9 | Supported (v1.2.0) | Java 8 |
 
 ---
 

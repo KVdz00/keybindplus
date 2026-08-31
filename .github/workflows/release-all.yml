@@ -1,0 +1,81 @@
+name: Release All Versions
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-matrix:
+    name: Build (${{ matrix.branch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - branch: main
+            java: 25
+            artifact_pattern: "fabric/build/libs/*-fabric.jar\nneoforge/build/libs/*-neoforge.jar"
+          - branch: 1.21.x
+            java: 21
+            artifact_pattern: "fabric/build/libs/*-fabric.jar\nneoforge/build/libs/*-neoforge.jar"
+          - branch: 1.20.x
+            java: 17
+            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+          - branch: 1.19.x
+            java: 17
+            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+          - branch: 1.18.x
+            java: 17
+            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+          - branch: 1.17.x
+            java: 17
+            artifact_pattern: "fabric/build/libs/*-fabric.jar\nforge/build/libs/*-forge.jar"
+          - branch: 1.8.9
+            java: 17
+            artifact_pattern: "build/libs/*-forge-1.8.9.jar"
+
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant Execute Permission
+        run: chmod +x gradlew
+
+      - name: Build Mod with Gradle
+        run: ./gradlew build --no-daemon
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: keybindplus-${{ matrix.branch }}
+          path: ${{ matrix.artifact_pattern }}
+
+  publish-release:
+    name: Publish Multi-Version Release
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
+          generate_release_notes: true

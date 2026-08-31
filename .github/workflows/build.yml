@@ -1,23 +1,36 @@
-name: Build
+name: Build CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "1.21.x", "1.20.x", "1.19.x", "1.18.x", "1.17.x", "1.8.9" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "1.21.x", "1.20.x", "1.19.x", "1.18.x", "1.17.x", "1.8.9" ]
 
 jobs:
   build:
+    name: Build Branch
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 25
+      - name: Detect Java Version
+        id: java_detect
+        run: |
+          REF="${{ github.ref_name }}"
+          if [ "$REF" = "main" ]; then
+            echo "java_version=25" >> $GITHUB_OUTPUT
+          elif [ "$REF" = "1.21.x" ]; then
+            echo "java_version=21" >> $GITHUB_OUTPUT
+          else
+            echo "java_version=17" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: ${{ steps.java_detect.outputs.java_version }}
           distribution: 'temurin'
           cache: gradle
 
@@ -30,7 +43,9 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: keybindplus-builds
+          name: keybindplus-${{ github.ref_name }}
           path: |
-            fabric/build/libs/*.jar
-            neoforge/build/libs/*.jar
+            fabric/build/libs/*-fabric.jar
+            neoforge/build/libs/*-neoforge.jar
+            forge/build/libs/*-forge.jar
+            build/libs/*-forge-1.8.9.jar
