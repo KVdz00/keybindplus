@@ -73,7 +73,7 @@ public class KeybindEditorScreen extends Screen {
 
         // Keybind scroll list
         this.listWidget = new KeybindEditListWidget(this.minecraft, this,
-            this.width, this.height - 86, 48, 28);
+            this.width, this.height, 48, this.height - 38, 28);
         this.addRenderableWidget(this.listWidget);
 
         // Bottom action buttons

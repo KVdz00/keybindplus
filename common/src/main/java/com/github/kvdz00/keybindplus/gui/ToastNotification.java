@@ -2,7 +2,7 @@ package com.github.kvdz00.keybindplus.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.components.toasts.ToastManager;
+import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
 
 public final class ToastNotification {
@@ -12,9 +12,9 @@ public final class ToastNotification {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null) return;
 
-        ToastManager tm = mc.getToastManager();
-        if (tm != null) {
-            SystemToast.addOrUpdate(tm, SystemToast.SystemToastId.PERIODIC_NOTIFICATION, title, description);
+        ToastComponent tc = mc.getToasts();
+        if (tc != null) {
+            SystemToast.addOrUpdate(tc, SystemToast.SystemToastIds.PERIODIC_NOTIFICATION, title, description);
         }
     }
 

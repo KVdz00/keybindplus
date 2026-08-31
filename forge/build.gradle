@@ -4,7 +4,7 @@ plugins {
 
 architectury {
     platformSetupLoomIde()
-    neoForge()
+    forge()
 }
 
 configurations {
@@ -14,7 +14,7 @@ configurations {
     }
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentNeoForge.extendsFrom common
+    developmentForge.extendsFrom common
 
     shadowCommon {
         canBeResolved = true
@@ -23,19 +23,22 @@ configurations {
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:${rootProject.property("neoforge_version")}"
-    implementation "net.neoforged.fancymodloader:loader:6.0.11"
-    implementation "net.neoforged:bus:8.0.2"
-    implementation "dev.architectury:architectury-neoforge:${rootProject.property("architectury_api_version")}"
+    implementation "net.minecraftforge:forge:${rootProject.property("forge_version")}"
+    implementation "net.minecraftforge:fmlcore:${rootProject.property("forge_version")}"
+    implementation "net.minecraftforge:fmlloader:${rootProject.property("forge_version")}"
+    implementation "net.minecraftforge:javafmllanguage:${rootProject.property("forge_version")}"
+    implementation "net.minecraftforge:eventbus:6.0.5"
+    implementation "net.minecraftforge:forgespi:7.0.0"
+    implementation "dev.architectury:architectury-forge:${rootProject.property("architectury_api_version")}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }
 
 processResources {
     inputs.property "version", project.version
 
-    filesMatching("META-INF/neoforge.mods.toml") {
+    filesMatching("META-INF/mods.toml") {
         expand "version": project.version
     }
 }
@@ -48,7 +51,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    archiveClassifier = null
+    archiveClassifier = "forge"
 }
 
 jar {

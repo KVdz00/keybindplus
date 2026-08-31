@@ -31,7 +31,7 @@ public class ConflictWarningPopup extends Screen {
         int centerX = this.width / 2;
 
         // Scrollable conflict list
-        this.conflictList = new ConflictListWidget(this.minecraft, this.width, this.height - 84, 48, 20);
+        this.conflictList = new ConflictListWidget(this.minecraft, this.width, this.height, 48, this.height - 36, 20);
         for (KeyConflict conflict : conflicts) {
             this.conflictList.addConflict(conflict);
         }
@@ -65,8 +65,8 @@ public class ConflictWarningPopup extends Screen {
     }
 
     public static class ConflictListWidget extends ObjectSelectionList<ConflictListWidget.ConflictEntry> {
-        public ConflictListWidget(Minecraft minecraft, int width, int height, int top, int itemHeight) {
-            super(minecraft, width, height, top, itemHeight);
+        public ConflictListWidget(Minecraft minecraft, int width, int height, int top, int bottom, int itemHeight) {
+            super(minecraft, width, height, top, bottom, itemHeight);
         }
 
         @Override

@@ -105,7 +105,7 @@ public class KeybindPlusScreen extends Screen {
 
         // Profile list
         this.profileList = new ProfileListWidget(this.minecraft, this,
-            this.width, this.height - 134, 48, 28);
+            this.width, this.height, 48, this.height - 86, 28);
         this.addRenderableWidget(this.profileList);
 
         // Row 1: Core Primary Actions (3 buttons, 100px each, gap 4px = 308px)
@@ -267,7 +267,7 @@ public class KeybindPlusScreen extends Screen {
 
     private void onOpenFolder() {
         Path configDir = KeybindPlusConfig.getConfigDir();
-        Util.getPlatform().openPath(configDir);
+        Util.getPlatform().openFile(configDir.toFile());
     }
 
     private void onSave() {

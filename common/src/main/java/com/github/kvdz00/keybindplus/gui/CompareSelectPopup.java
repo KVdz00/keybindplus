@@ -37,7 +37,7 @@ public class CompareSelectPopup extends Screen {
     protected void init() {
         int centerX = this.width / 2;
 
-        this.listWidget = new TargetListWidget(this.minecraft, this.width, this.height - 96, 52, 24);
+        this.listWidget = new TargetListWidget(this.minecraft, this.width, this.height, 52, this.height - 44, 24);
         for (KeybindProfile p : candidateProfiles) {
             this.listWidget.addProfile(p);
         }
@@ -91,8 +91,8 @@ public class CompareSelectPopup extends Screen {
     }
 
     private class TargetListWidget extends ObjectSelectionList<TargetListWidget.TargetEntry> {
-        TargetListWidget(Minecraft minecraft, int width, int height, int top, int itemHeight) {
-            super(minecraft, width, height, top, itemHeight);
+        TargetListWidget(Minecraft minecraft, int width, int height, int top, int bottom, int itemHeight) {
+            super(minecraft, width, height, top, bottom, itemHeight);
         }
 
         @Override

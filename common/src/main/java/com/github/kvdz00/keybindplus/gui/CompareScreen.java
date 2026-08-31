@@ -88,7 +88,7 @@ public class CompareScreen extends Screen {
         .build());
 
         this.listWidget = new CompareListWidget(this.minecraft, this,
-            this.width, this.height - 90, 58, 28);
+            this.width, this.height, 58, this.height - 34, 28);
         this.addRenderableWidget(this.listWidget);
 
         this.addRenderableWidget(Button.builder(
@@ -221,8 +221,8 @@ public class CompareScreen extends Screen {
 
     public class CompareListWidget extends ContainerObjectSelectionList<CompareListWidget.Entry> {
         public CompareListWidget(Minecraft minecraft, CompareScreen screen,
-                                 int width, int height, int top, int itemHeight) {
-            super(minecraft, width, height, top, itemHeight);
+                                 int width, int height, int top, int bottom, int itemHeight) {
+            super(minecraft, width, height, top, bottom, itemHeight);
         }
 
         @Override

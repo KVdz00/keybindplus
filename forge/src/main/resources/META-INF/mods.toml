@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[1,)"
+loaderVersion = "[47,)"
 license = "MIT"
 issueTrackerURL = "https://github.com/KVdz00/keybindplus/issues"
 
@@ -13,22 +13,22 @@ displayURL = "https://github.com/KVdz00/keybindplus"
 logoFile = "icon.png"
 
 [[dependencies.keybindplus]]
-modId = "neoforge"
+modId = "forge"
 type = "required"
-versionRange = "[21.0, 22.0)"
+versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.keybindplus]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21, 1.22)"
+versionRange = "[1.20, 1.21)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.keybindplus]]
 modId = "architectury"
 type = "required"
-versionRange = "[13,)"
+versionRange = "[9,)"
 ordering = "NONE"
 side = "BOTH"

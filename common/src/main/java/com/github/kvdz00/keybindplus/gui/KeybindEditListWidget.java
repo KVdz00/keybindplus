@@ -19,8 +19,8 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
     private final KeybindEditorScreen screen;
 
     public KeybindEditListWidget(Minecraft minecraft, KeybindEditorScreen screen,
-                                 int width, int height, int top, int itemHeight) {
-        super(minecraft, width, height, top, itemHeight);
+                                 int width, int height, int top, int bottom, int itemHeight) {
+        super(minecraft, width, height, top, bottom, itemHeight);
         this.screen = screen;
     }
 

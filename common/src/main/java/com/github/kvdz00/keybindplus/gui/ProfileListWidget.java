@@ -17,8 +17,8 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
     private final KeybindPlusScreen parentScreen;
 
     public ProfileListWidget(Minecraft minecraft, KeybindPlusScreen parentScreen,
-                             int width, int height, int top, int itemHeight) {
-        super(minecraft, width, height, top, itemHeight);
+                             int width, int height, int top, int bottom, int itemHeight) {
+        super(minecraft, width, height, top, bottom, itemHeight);
         this.parentScreen = parentScreen;
     }
 
