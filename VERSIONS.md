@@ -4,17 +4,24 @@ KeybindPlus follows standard Minecraft modding practices by maintaining version-
 
 ---
 
+> [!IMPORTANT]
+> **Development & Stability Status**:
+> - **Minecraft 26.2 (`main`)** is the primary **STABLE** production release.
+> - All ported branches (`1.21.x`, `1.20.x`, `1.19.x`, `1.18.x`, `1.17.x`, `1.8.9`) are currently **EXPERIMENTAL & IN ACTIVE DEVELOPMENT (Tidak Stabil / Masih Dalam Pengembangan)**. Compiled builds are automatically generated as artifacts via GitHub Actions for testing.
+
+---
+
 ## Version Support Matrix
 
 | Minecraft Version | Branch | Mod Loader(s) | Status | Java Version |
 | :--- | :--- | :--- | :--- | :--- |
-| **26.2 (Active)** | `main` | Fabric, NeoForge | Supported (v1.2.0) | Java 25 |
-| **1.21.x (1.21 - 1.21.11)** | `1.21.x` | Fabric, NeoForge | Supported (v1.2.0) | Java 21 |
-| **1.20.x (1.20 - 1.20.4)** | `1.20.x` | Fabric, Forge | Supported (v1.2.0) | Java 17 |
-| **1.19.x (1.19 - 1.19.4)** | `1.19.x` | Fabric, Forge | Supported (v1.2.0) | Java 17 |
-| **1.18.x (1.18 - 1.18.2)** | `1.18.x` | Fabric, Forge | Supported (v1.2.0) | Java 17 |
-| **1.17.x (1.17 - 1.17.1)** | `1.17.x` | Fabric, Forge | Supported (v1.2.0) | Java 16 / 17 |
-| **1.8.9 (Old PvP)** | `1.8.9` | Forge 1.8.9 | Supported (v1.2.0) | Java 8 |
+| **26.2 (Active)** | `main` | Fabric, NeoForge | **Stable (v1.2.0)** | Java 25 |
+| **1.21.x (1.21 - 1.21.11)** | `1.21.x` | Fabric, NeoForge | *Experimental / In Development (Beta)* | Java 21 |
+| **1.20.x (1.20 - 1.20.4)** | `1.20.x` | Fabric, Forge | *Experimental / In Development (Beta)* | Java 17 |
+| **1.19.x (1.19 - 1.19.4)** | `1.19.x` | Fabric, Forge | *Experimental / In Development (Beta)* | Java 17 |
+| **1.18.x (1.18 - 1.18.2)** | `1.18.x` | Fabric, Forge | *Experimental / In Development (Beta)* | Java 17 |
+| **1.17.x (1.17 - 1.17.1)** | `1.17.x` | Fabric, Forge | *Experimental / In Development (Beta)* | Java 16 / 17 |
+| **1.8.9 (Old PvP)** | `1.8.9` | Forge 1.8.9 | *Experimental / In Development (Alpha)* | Java 8 |
 
 ---
 

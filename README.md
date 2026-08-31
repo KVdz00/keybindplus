@@ -52,10 +52,11 @@
 
 ## Installation & Requirements
 
+- **Primary Supported Release**: Minecraft **26.2+** (Stable v1.2.0)
 - **Supported Loaders**: Fabric Loader (`>=0.19.0`) & NeoForge (`>=26.2`)
 - **Required Dependencies**: Architectury API, Fabric API (Fabric only)
-- **Java Runtime**: Java 25+
-- **Minecraft Version**: 26.2+ *(See [VERSIONS.md](VERSIONS.md) for 1.17–1.21 and 1.8.9 legacy roadmap)*
+- **Java Runtime**: Java 25+ (for 26.2)
+- **Legacy & Backport Versions**: 1.21.x, 1.20.x, 1.19.x, 1.18.x, 1.17.x, and 1.8.9 are currently in **active development / experimental** state. See [VERSIONS.md](VERSIONS.md) for branch matrices and CI builds.
 
 Place the compiled `.jar` file into your `.minecraft/mods/` directory and launch the game.
 
