@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,7 +28,7 @@ public class CompareSelectPopup extends Screen {
     public CompareSelectPopup(Screen parent, KeybindProfile sourceProfile,
                               List<KeybindProfile> candidateProfiles,
                               Consumer<KeybindProfile> onTargetSelected) {
-        super(Component.translatable("keybindplus.popup.compare_title"));
+        super(new TranslatableComponent("keybindplus.popup.compare_title"));
         this.parent = parent;
         this.sourceProfile = sourceProfile;
         this.candidateProfiles = candidateProfiles;
@@ -46,7 +48,7 @@ public class CompareSelectPopup extends Screen {
         int btnY = this.height - 32;
         this.compareButton = this.addRenderableWidget(new Button(
             centerX - 105, btnY, 100, 20,
-            Component.translatable("keybindplus.screen.compare"),
+            new TranslatableComponent("keybindplus.screen.compare"),
             btn -> {
                 KeybindProfile target = listWidget.getSelectedProfile();
                 if (target != null) {
@@ -58,7 +60,7 @@ public class CompareSelectPopup extends Screen {
 
         this.addRenderableWidget(new Button(
             centerX + 5, btnY, 100, 20,
-            Component.translatable("keybindplus.popup.cancel"),
+            new TranslatableComponent("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
         ));
 
@@ -81,9 +83,9 @@ public class CompareSelectPopup extends Screen {
         drawCenteredString(poseStack, this.font, this.title, this.width / 2, 12, 0xFFFFFF);
 
         ChatFormatting sourceColor = sourceProfile.isLoaded() ? ChatFormatting.GREEN : (sourceProfile.isImported() ? ChatFormatting.AQUA : ChatFormatting.WHITE);
-        MutableComponent sub = Component.translatable(
+        MutableComponent sub = new TranslatableComponent(
             "keybindplus.popup.compare_subtitle",
-            Component.literal(sourceProfile.getName()).withStyle(sourceColor, ChatFormatting.BOLD)
+            new TextComponent(sourceProfile.getName()).withStyle(sourceColor, ChatFormatting.BOLD)
         );
         drawCenteredString(poseStack, this.font, sub, this.width / 2, 28, 0xFFFFFF);
     }
@@ -138,9 +140,9 @@ public class CompareSelectPopup extends Screen {
                     nameColor = ChatFormatting.WHITE;
                 }
 
-                MutableComponent text = Component.literal(profile.getName()).withStyle(nameColor);
+                MutableComponent text = new TextComponent(profile.getName()).withStyle(nameColor);
                 if (profile.isDefault()) {
-                    text.append(Component.literal(" \u2605").withStyle(ChatFormatting.GOLD));
+                    text.append(new TextComponent(" \u2605").withStyle(ChatFormatting.GOLD));
                 }
 
                 CompareSelectPopup.this.minecraft.font.draw(poseStack, text, left + 6, top + 6, 0xFFFFFF);
@@ -161,7 +163,7 @@ public class CompareSelectPopup extends Screen {
 
             @Override
             public Component getNarration() {
-                return Component.literal(profile.getName());
+                return new TextComponent(profile.getName());
             }
         }
     }

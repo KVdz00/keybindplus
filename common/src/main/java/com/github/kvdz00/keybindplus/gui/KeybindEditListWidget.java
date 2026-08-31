@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,26 +53,26 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
 
             Component keyLabel;
             if (isListening) {
-                keyLabel = Component.translatable("keybindplus.editor.press_key")
+                keyLabel = new TranslatableComponent("keybindplus.editor.press_key")
                     .withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
             } else if (isUnknownKey(data.keyName())) {
-                keyLabel = Component.translatable("keybindplus.editor.none")
+                keyLabel = new TranslatableComponent("keybindplus.editor.none")
                     .withStyle(ChatFormatting.DARK_GRAY);
             } else {
                 String formatted = formatKeyName(data.keyName());
                 keyLabel = isConflicted
-                    ? Component.literal(formatted).withStyle(ChatFormatting.RED, ChatFormatting.BOLD)
-                    : Component.literal(formatted).withStyle(ChatFormatting.WHITE);
+                    ? new TextComponent(formatted).withStyle(ChatFormatting.RED, ChatFormatting.BOLD)
+                    : new TextComponent(formatted).withStyle(ChatFormatting.WHITE);
             }
 
             if (isConflicted && conflictingActions != null && !conflictingActions.isEmpty()) {
                 String conflictNames = conflictingActions.stream()
-                    .map(a -> Component.translatable(a).getString())
+                    .map(a -> new TranslatableComponent(a).getString())
                     .collect(Collectors.joining(", "));
                 this.keyButton = new Button(0, 0, 84, 20, keyLabel,
                     btn -> screen.setActiveRebindAction(data.actionId()),
                     (btn, poseStack, mx, my) -> screen.renderTooltip(poseStack,
-                        Component.translatable("keybindplus.editor.conflict_tooltip", conflictNames)
+                        new TranslatableComponent("keybindplus.editor.conflict_tooltip", conflictNames)
                             .withStyle(ChatFormatting.RED), mx, my));
             } else {
                 this.keyButton = new Button(0, 0, 84, 20, keyLabel,
@@ -79,10 +81,10 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
 
             boolean isAlreadyNone = isUnknownKey(data.keyName());
             this.unbindButton = new Button(0, 0, 44, 20,
-                Component.translatable("keybindplus.editor.unbind"),
+                new TranslatableComponent("keybindplus.editor.unbind"),
                 btn -> screen.unbindAction(data.actionId()),
                 (btn, poseStack, mx, my) -> screen.renderTooltip(poseStack,
-                    Component.translatable("keybindplus.tooltip.editor_unbind"), mx, my));
+                    new TranslatableComponent("keybindplus.tooltip.editor_unbind"), mx, my));
             this.unbindButton.active = !isAlreadyNone && !isListening;
 
             this.children = List.of(this.keyButton, this.unbindButton);
@@ -106,7 +108,7 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
             this.unbindButton.y = rowY + 4;
             this.unbindButton.render(poseStack, mouseX, mouseY, partialTick);
 
-            MutableComponent actionText = Component.translatable(data.actionId());
+            MutableComponent actionText = new TranslatableComponent(data.actionId());
             if (isListening()) {
                 actionText = actionText.withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
             }
@@ -116,7 +118,7 @@ public class KeybindEditListWidget extends ContainerObjectSelectionList<KeybindE
             String cat = data.category();
             if (cat != null && !cat.isBlank()) {
                 Minecraft.getInstance().font.draw(poseStack,
-                    Component.literal(cat).withStyle(ChatFormatting.DARK_GRAY), rowX, rowY + 15, 0x888888);
+                    new TextComponent(cat).withStyle(ChatFormatting.DARK_GRAY), rowX, rowY + 15, 0x888888);
             }
         }
 

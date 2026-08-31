@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "[40,)"
 license = "MIT"
 issueTrackerURL = "https://github.com/KVdz00/keybindplus/issues"
 
@@ -15,20 +15,20 @@ logoFile = "icon.png"
 [[dependencies.keybindplus]]
 modId = "forge"
 type = "required"
-versionRange = "[43,)"
+versionRange = "[40,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.keybindplus]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.19, 1.20)"
+versionRange = "[1.18, 1.19)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.keybindplus]]
 modId = "architectury"
 type = "required"
-versionRange = "[6,)"
+versionRange = "[4,)"
 ordering = "NONE"
 side = "BOTH"

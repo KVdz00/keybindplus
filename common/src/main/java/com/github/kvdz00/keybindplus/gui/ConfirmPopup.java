@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class ConfirmPopup extends Screen {
     private final Screen parent;
@@ -11,7 +12,7 @@ public class ConfirmPopup extends Screen {
     private final Runnable onConfirm;
 
     public ConfirmPopup(Screen parent, Component message, Runnable onConfirm) {
-        super(Component.translatable("keybindplus.popup.confirm"));
+        super(new TranslatableComponent("keybindplus.popup.confirm"));
         this.parent = parent;
         this.message = message;
         this.onConfirm = onConfirm;
@@ -24,13 +25,13 @@ public class ConfirmPopup extends Screen {
 
         this.addRenderableWidget(new Button(
             centerX - 105, centerY + 10, 100, 20,
-            Component.translatable("keybindplus.popup.confirm"),
+            new TranslatableComponent("keybindplus.popup.confirm"),
             btn -> { onConfirm.run(); this.minecraft.setScreen(parent); }
         ));
 
         this.addRenderableWidget(new Button(
             centerX + 5, centerY + 10, 100, 20,
-            Component.translatable("keybindplus.popup.cancel"),
+            new TranslatableComponent("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
         ));
     }

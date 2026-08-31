@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public final class ToastNotification {
     private ToastNotification() {}
@@ -19,6 +20,6 @@ public final class ToastNotification {
     }
 
     public static void toast(String titleKey, String descKey, Object... args) {
-        show(Component.translatable(titleKey), Component.translatable(descKey, args));
+        show(new TranslatableComponent(titleKey), new TranslatableComponent(descKey, args));
     }
 }

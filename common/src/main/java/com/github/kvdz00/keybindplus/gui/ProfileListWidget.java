@@ -8,6 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -90,9 +92,9 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
                 nameColor = ChatFormatting.WHITE;
             }
 
-            MutableComponent title = Component.literal(profile.getName()).withStyle(nameColor);
+            MutableComponent title = new TextComponent(profile.getName()).withStyle(nameColor);
             if (profile.isDefault()) {
-                title.append(Component.literal(" \u2605").withStyle(ChatFormatting.GOLD));
+                title.append(new TextComponent(" \u2605").withStyle(ChatFormatting.GOLD));
             }
 
             int keyCount = profile.getKeybinds().size();
@@ -103,7 +105,7 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
             }
 
             ProfileListWidget.this.minecraft.font.draw(poseStack, title, left + 6, top + 3, 0xFFFFFF);
-            ProfileListWidget.this.minecraft.font.draw(poseStack, Component.literal(meta).withStyle(ChatFormatting.DARK_GRAY),
+            ProfileListWidget.this.minecraft.font.draw(poseStack, new TextComponent(meta).withStyle(ChatFormatting.DARK_GRAY),
                 left + 6, top + 14, 0x888888);
         }
 
@@ -122,7 +124,7 @@ public class ProfileListWidget extends ObjectSelectionList<ProfileListWidget.Ent
 
         @Override
         public Component getNarration() {
-            return Component.literal(profile.getName());
+            return new TextComponent(profile.getName());
         }
     }
 }

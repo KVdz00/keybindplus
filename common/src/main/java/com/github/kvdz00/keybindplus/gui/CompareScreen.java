@@ -17,6 +17,8 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.time.Instant;
 import java.util.*;
@@ -35,7 +37,7 @@ public class CompareScreen extends Screen {
     private boolean diffsOnly;
 
     public CompareScreen(Screen parent, KeybindProfile profileA, KeybindProfile profileB) {
-        super(Component.translatable("keybindplus.compare.title", profileA.getName(), profileB.getName()));
+        super(new TranslatableComponent("keybindplus.compare.title", profileA.getName(), profileB.getName()));
         this.parent = parent;
         this.profileA = profileA;
         this.profileB = profileB;
@@ -71,7 +73,7 @@ public class CompareScreen extends Screen {
         int centerX = this.width / 2;
 
         this.searchField = new EditBox(this.font, centerX - 190, 24, 190, 18,
-            Component.translatable("keybindplus.compare.search"));
+            new TranslatableComponent("keybindplus.compare.search"));
         this.searchField.setResponder(q -> refreshList());
         this.addRenderableWidget(this.searchField);
 
@@ -83,7 +85,7 @@ public class CompareScreen extends Screen {
                 this.filterButton.setMessage(getFilterButtonLabel());
                 refreshList();
             },
-            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.compare_filter"), mx, my)
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.compare_filter"), mx, my)
         ));
 
         this.listWidget = new CompareListWidget(this.minecraft, this,
@@ -92,7 +94,7 @@ public class CompareScreen extends Screen {
 
         this.addRenderableWidget(new Button(
             centerX - 50, this.height - 28, 100, 20,
-            Component.translatable("keybindplus.screen.done"),
+            new TranslatableComponent("keybindplus.screen.done"),
             btn -> this.minecraft.setScreen(parent)
         ));
 
@@ -102,8 +104,8 @@ public class CompareScreen extends Screen {
     private Component getFilterButtonLabel() {
         long diffCount = allRows.stream().filter(CompareRowData::different).count();
         return diffsOnly
-            ? Component.translatable("keybindplus.compare.filter_diffs", diffCount)
-            : Component.translatable("keybindplus.compare.filter_all", allRows.size());
+            ? new TranslatableComponent("keybindplus.compare.filter_diffs", diffCount)
+            : new TranslatableComponent("keybindplus.compare.filter_all", allRows.size());
     }
 
     private void refreshList() {
@@ -144,7 +146,7 @@ public class CompareScreen extends Screen {
         ToastNotification.toast(
             "keybindplus.toast.synced_title",
             "keybindplus.toast.synced_desc",
-            Component.translatable(actionId).getString(),
+            new TranslatableComponent(actionId).getString(),
             formatKeyName(sourceKey),
             targetProfile.getName()
         );
@@ -169,13 +171,13 @@ public class CompareScreen extends Screen {
         ChatFormatting colorB = profileB.isLoaded() ? ChatFormatting.GREEN : (profileB.isImported() ? ChatFormatting.AQUA : (profileB.isDefault() ? ChatFormatting.GOLD : ChatFormatting.WHITE));
 
         this.font.draw(poseStack,
-            Component.translatable("keybindplus.compare.action").withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD),
+            new TranslatableComponent("keybindplus.compare.action").withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD),
             colActionX, headerY, 0xAAAAAA);
         this.font.draw(poseStack,
-            Component.literal(truncate(profileA.getName(), 12)).withStyle(colorA, ChatFormatting.BOLD),
+            new TextComponent(truncate(profileA.getName(), 12)).withStyle(colorA, ChatFormatting.BOLD),
             colA_X, headerY, 0xFFFFFF);
         this.font.draw(poseStack,
-            Component.literal(truncate(profileB.getName(), 12)).withStyle(colorB, ChatFormatting.BOLD),
+            new TextComponent(truncate(profileB.getName(), 12)).withStyle(colorB, ChatFormatting.BOLD),
             colB_X, headerY, 0xFFFFFF);
 
         fill(poseStack, startX, headerY + 10, startX + rowWidth, headerY + 11, 0xFF444444);
@@ -249,16 +251,16 @@ public class CompareScreen extends Screen {
                 if (data.different()) {
                     this.syncToAButton = new Button(
                         0, 0, 16, 16,
-                        Component.literal("<"),
+                        new TextComponent("<"),
                         btn -> syncKey(data.actionId(), data.valueB(), profileA),
-                        (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.compare.copy_to_a", profileA.getName()), mx, my)
+                        (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.compare.copy_to_a", profileA.getName()), mx, my)
                     );
 
                     this.syncToBButton = new Button(
                         0, 0, 16, 16,
-                        Component.literal(">"),
+                        new TextComponent(">"),
                         btn -> syncKey(data.actionId(), data.valueA(), profileB),
-                        (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.compare.copy_to_b", profileB.getName()), mx, my)
+                        (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.compare.copy_to_b", profileB.getName()), mx, my)
                     );
 
                     this.children = List.of(this.syncToAButton, this.syncToBButton);
@@ -300,7 +302,7 @@ public class CompareScreen extends Screen {
                     GuiComponent.fill(poseStack, baseX, rowY + 1, baseX + rowWidth, rowY + 27, 0x12FFFFFF);
                 }
 
-                MutableComponent actionText = Component.translatable(data.actionId());
+                MutableComponent actionText = new TranslatableComponent(data.actionId());
                 if (data.different()) {
                     actionText = actionText.withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
                 } else {
@@ -311,11 +313,11 @@ public class CompareScreen extends Screen {
                 String category = actionCategories.getOrDefault(data.actionId(), "");
                 if (!category.isEmpty()) {
                     Minecraft.getInstance().font.draw(poseStack,
-                        Component.literal(category).withStyle(ChatFormatting.DARK_GRAY), colActionX, rowY + 15, 0x888888);
+                        new TextComponent(category).withStyle(ChatFormatting.DARK_GRAY), colActionX, rowY + 15, 0x888888);
                 }
 
                 String keyA = formatKeyName(data.valueA());
-                MutableComponent textA = Component.literal(keyA);
+                MutableComponent textA = new TextComponent(keyA);
                 if (data.different()) {
                     textA = textA.withStyle(checkUnknownKey(data.valueA()) ? ChatFormatting.DARK_GRAY : ChatFormatting.WHITE);
                 } else {
@@ -324,7 +326,7 @@ public class CompareScreen extends Screen {
                 Minecraft.getInstance().font.draw(poseStack, textA, colA_X, rowY + 8, 0xFFFFFF);
 
                 String keyB = formatKeyName(data.valueB());
-                MutableComponent textB = Component.literal(keyB);
+                MutableComponent textB = new TextComponent(keyB);
                 if (data.different()) {
                     textB = textB.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
                 } else {

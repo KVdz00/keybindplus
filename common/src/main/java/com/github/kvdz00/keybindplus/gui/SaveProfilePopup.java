@@ -5,6 +5,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
@@ -23,7 +24,7 @@ public class SaveProfilePopup extends Screen {
     }
 
     public SaveProfilePopup(Screen parent, Consumer<String> onSave) {
-        this(parent, Component.translatable("keybindplus.popup.save_title"), "", onSave);
+        this(parent, new TranslatableComponent("keybindplus.popup.save_title"), "", onSave);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class SaveProfilePopup extends Screen {
         int centerY = this.height / 2;
 
         this.nameField = new EditBox(this.font, centerX - 100, centerY - 10, 200, 20,
-            Component.translatable("keybindplus.popup.save_name"));
+            new TranslatableComponent("keybindplus.popup.save_name"));
         this.nameField.setMaxLength(64);
         if (!this.initialValue.isEmpty()) {
             this.nameField.setValue(this.initialValue);
@@ -43,13 +44,13 @@ public class SaveProfilePopup extends Screen {
 
         this.addRenderableWidget(new Button(
             centerX - 105, centerY + 20, 100, 20,
-            Component.translatable("keybindplus.popup.save"),
+            new TranslatableComponent("keybindplus.popup.save"),
             btn -> doSave()
         ));
 
         this.addRenderableWidget(new Button(
             centerX + 5, centerY + 20, 100, 20,
-            Component.translatable("keybindplus.popup.cancel"),
+            new TranslatableComponent("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
         ));
     }

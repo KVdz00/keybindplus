@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.lwjgl.glfw.GLFW;
 
 import java.time.Instant;
@@ -33,7 +35,7 @@ public class KeybindEditorScreen extends Screen {
     }
 
     public KeybindEditorScreen(Screen parent, KeybindProfile profile, boolean startWithConflictsOnly) {
-        super(Component.translatable("keybindplus.editor.title", profile.getName()));
+        super(new TranslatableComponent("keybindplus.editor.title", profile.getName()));
         this.parent = parent;
         this.profile = profile;
         this.conflictsOnly = startWithConflictsOnly;
@@ -52,7 +54,7 @@ public class KeybindEditorScreen extends Screen {
         int centerX = this.width / 2;
 
         this.searchField = new EditBox(this.font, centerX - 154, 26, 170, 18,
-            Component.translatable("keybindplus.editor.search"));
+            new TranslatableComponent("keybindplus.editor.search"));
         this.searchField.setResponder(q -> refreshList());
         this.addRenderableWidget(this.searchField);
 
@@ -64,7 +66,7 @@ public class KeybindEditorScreen extends Screen {
                 this.filterButton.setMessage(getFilterButtonLabel());
                 refreshList();
             },
-            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.editor_filter"), mx, my)
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.editor_filter"), mx, my)
         ));
 
         this.listWidget = new KeybindEditListWidget(this.minecraft, this,
@@ -74,21 +76,21 @@ public class KeybindEditorScreen extends Screen {
         int btnY = this.height - 30;
         this.addRenderableWidget(new Button(
             centerX - 154, btnY, 100, 20,
-            Component.translatable("keybindplus.editor.save_apply"),
+            new TranslatableComponent("keybindplus.editor.save_apply"),
             btn -> onSaveAndApply(),
-            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.editor_save_apply"), mx, my)
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.editor_save_apply"), mx, my)
         ));
 
         this.addRenderableWidget(new Button(
             centerX - 50, btnY, 96, 20,
-            Component.translatable("keybindplus.popup.save"),
+            new TranslatableComponent("keybindplus.popup.save"),
             btn -> onSaveOnly(),
-            (btn, poseStack, mx, my) -> renderTooltip(poseStack, Component.translatable("keybindplus.tooltip.save"), mx, my)
+            (btn, poseStack, mx, my) -> renderTooltip(poseStack, new TranslatableComponent("keybindplus.tooltip.save"), mx, my)
         ));
 
         this.addRenderableWidget(new Button(
             centerX + 50, btnY, 104, 20,
-            Component.translatable("keybindplus.popup.cancel"),
+            new TranslatableComponent("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
         ));
 
@@ -98,8 +100,8 @@ public class KeybindEditorScreen extends Screen {
     private Component getFilterButtonLabel() {
         int conflictCount = calculateConflictMap().size();
         return conflictsOnly
-            ? Component.translatable("keybindplus.editor.filter_conflicts", conflictCount)
-            : Component.translatable("keybindplus.editor.filter_all", workingKeybinds.size());
+            ? new TranslatableComponent("keybindplus.editor.filter_conflicts", conflictCount)
+            : new TranslatableComponent("keybindplus.editor.filter_all", workingKeybinds.size());
     }
 
     private Map<String, List<String>> calculateConflictMap() {

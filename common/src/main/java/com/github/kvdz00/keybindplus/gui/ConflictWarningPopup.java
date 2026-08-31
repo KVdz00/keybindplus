@@ -8,6 +8,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.List;
 
@@ -19,7 +21,7 @@ public class ConflictWarningPopup extends Screen {
     private ConflictListWidget conflictList;
 
     public ConflictWarningPopup(Screen parent, KeybindProfile profile, List<KeyConflict> conflicts, Runnable onApply) {
-        super(Component.translatable("keybindplus.popup.conflict_title"));
+        super(new TranslatableComponent("keybindplus.popup.conflict_title"));
         this.parent = parent;
         this.profile = profile;
         this.conflicts = conflicts;
@@ -39,19 +41,19 @@ public class ConflictWarningPopup extends Screen {
         int btnY = this.height - 30;
         this.addRenderableWidget(new Button(
             centerX - 154, btnY, 96, 20,
-            Component.translatable("keybindplus.popup.conflict_apply"),
+            new TranslatableComponent("keybindplus.popup.conflict_apply"),
             btn -> { onApply.run(); this.minecraft.setScreen(parent); }
         ));
 
         this.addRenderableWidget(new Button(
             centerX - 54, btnY, 114, 20,
-            Component.translatable("keybindplus.popup.conflict_resolve"),
+            new TranslatableComponent("keybindplus.popup.conflict_resolve"),
             btn -> this.minecraft.setScreen(new KeybindEditorScreen(parent, profile, true))
         ));
 
         this.addRenderableWidget(new Button(
             centerX + 64, btnY, 90, 20,
-            Component.translatable("keybindplus.popup.cancel"),
+            new TranslatableComponent("keybindplus.popup.cancel"),
             btn -> this.minecraft.setScreen(parent)
         ));
     }
@@ -63,7 +65,7 @@ public class ConflictWarningPopup extends Screen {
         int centerX = this.width / 2;
 
         drawCenteredString(poseStack, this.font, this.title, centerX, 12, 0xFFFFFF);
-        drawCenteredString(poseStack, this.font, Component.translatable("keybindplus.popup.conflict_subtitle"), centerX, 28, 0xAAAAAA);
+        drawCenteredString(poseStack, this.font, new TranslatableComponent("keybindplus.popup.conflict_subtitle"), centerX, 28, 0xAAAAAA);
     }
 
     public static class ConflictListWidget extends ObjectSelectionList<ConflictListWidget.ConflictEntry> {
@@ -95,12 +97,12 @@ public class ConflictWarningPopup extends Screen {
                     .map(this::formatAction).toList());
 
                 Minecraft.getInstance().font.draw(poseStack,
-                    Component.literal(keyDisplay + "  ->  " + actionsDisplay), left + 6, top + 4, 0xFFFFFF);
+                    new TextComponent(keyDisplay + "  ->  " + actionsDisplay), left + 6, top + 4, 0xFFFFFF);
             }
 
             @Override
             public Component getNarration() {
-                return Component.literal(conflict.key());
+                return new TextComponent(conflict.key());
             }
 
             private String formatKey(String key) {
